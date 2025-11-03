@@ -1,21 +1,22 @@
 <!DOCTYPE html>
+
 <html lang="vi">
 <head>
-  <!-- v2.5.6: Lớp 3 – thêm Bài 3 (Máy tính và em) + chèn hình minh họa (Bài 3 C6, C8, C15; Bài 2 C15); no other modules touched. -->
-  <!-- v2.5.3: Vietnamese-only TTS override appended. Modules unchanged. -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gấu Con Học Tin Học</title>
-    <link rel="shortcut icon" href="data/images/logo.jpg" type="image/jpeg">
-    <!-- Tải Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Thêm thư viện âm thanh Tone.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
-    <!-- Thêm font Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
+<!-- v2.5.6: Lớp 3 – thêm Bài 3 (Máy tính và em) + chèn hình minh họa (Bài 3 C6, C8, C15; Bài 2 C15); no other modules touched. -->
+<!-- v2.5.3: Vietnamese-only TTS override appended. Modules unchanged. -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gấu Con Học Tin Học</title>
+<link href="data/images/logo.jpg" rel="shortcut icon" type="image/jpeg"/>
+<!-- Tải Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Thêm thư viện âm thanh Tone.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+<!-- Thêm font Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
         /* CSS tùy chỉnh */
         body {
             font-family: 'Inter', sans-serif;
@@ -184,10 +185,9 @@
 .match-line-new { stroke-dasharray: 400; stroke-dashoffset: 400; animation: drawLine .6s ease-out forwards; }
 .match-dot { fill:#7c3aed; stroke:#fff; stroke-width:2; }
 </style>
-
-    <!-- Kids-friendly font for chatbot -->
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&display=swap" rel="stylesheet">
-    <style>
+<!-- Kids-friendly font for chatbot -->
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&amp;display=swap" rel="stylesheet"/>
+<style>
       /* === Chatbot UI (v2.7 kids) === */
       .kids-font { font-family: 'Baloo 2', system-ui, -apple-system, 'Segoe UI', Roboto, Inter, sans-serif; }
       #gau-chat-toggle { position: fixed; right: 18px; bottom: 18px; z-index: 60; }
@@ -220,323 +220,283 @@
       .gau-select { border: 1px solid #cbd5e1; background: white; border-radius: 10px; padding: 6px 8px; }
       .typing { opacity: .8; }
     </style>
-
-</head>
+<style>
+/* Auto-injected: brighten & saturate the bear image */
+.bear-image-bright {
+  filter: brightness(1.18) saturate(1.22) contrast(1.05);
+  transition: filter 200ms ease-in-out;
+}
+.bear-image-bright:hover {
+  filter: brightness(1.22) saturate(1.28) contrast(1.05);
+}
+</style></head>
 <body class="bg-gradient-to-b from-sky-200 to-amber-200 min-h-screen p-4 md:p-8 text-gray-800 overflow-x-hidden">
-    <!-- Trình phát âm thanh ẩn cho TTS -->
-    <audio id="tts-audio" style="display: none;"></audio>
-
-    <!-- ======================================================= -->
-    <!-- ==== TRANG CHỦ (MODULE CHỌN LỚP & CHỨC NĂNG) ==== -->
-    <!-- ======================================================= -->
-    <div id="page-home" class="page-container">
-        <!-- 1. Header (Logo và Tiêu đề) -->
-        <header class="flex flex-col items-center justify-center mb-10">
-            <!-- (MỚI) Brand Header (Trường TH Võng La) -->
-            <div class="flex items-center gap-3 mb-4">
-                <img src="data/images/logo.jpg" class="w-12 h-12 rounded-full border-2 border-white shadow-md" alt="Logo Trường TH Võng La">
-                <span class="text-xl font-bold text-blue-800">Trường Tiểu Học Võng La</span>
-            </div>
-
-            <!-- SVG Logo -->
-            <svg class="w-24 h-24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="45" fill="#FDE047"/>
-                <defs><clipPath id="circle-clip"><circle cx="50" cy="50" r="45"/></clipPath></defs>
-                <path d="M28 80 Q 50 70, 72 80 V 95 H 28 Z" fill="#3B82F6" clip-path="url(#circle-clip)"/>
-                <circle cx="28" cy="28" r="12" fill="#C27803"/><circle cx="72" cy="28" r="12" fill="#C27803"/>
-                <circle cx="50" cy="55" r="28" fill="#C27803"/>
-                <circle cx="30" cy="30" r="7" fill="#FCD34D"/><circle cx="70" cy="30" r="7" fill="#FCD34D"/>
-                <circle cx="42" cy="52" r="3" fill="#1F2937"/><circle cx="58" cy="52" r="3" fill="#1F2937"/>
-                <ellipse cx="36" cy="62" rx="5" ry="3" fill="#F472B6" fill-opacity="0.6"/><ellipse cx="64" cy="62" rx="5" ry="3" fill="#F472B6" fill-opacity="0.6"/>
-                <path d="M48 62 L 52 62 L 50 65 Z" fill="#1F2937"/>
-                <path d="M44 70 Q 50 74, 56 70" stroke="#1F2937" stroke-width="2" fill="none" stroke-linecap="round"/>
-            </svg>
-            <h1 class="text-3xl md:text-5xl font-extrabold text-blue-700 mt-4 text-center">Gấu Con Học Tin</h1>
-            <p class="text-xl md:text-2xl text-blue-600 font-medium text-center">Trợ lý học tập thông minh</p>
-            <p class="text-base md:text-lg text-gray-600 mt-1 text-center">Cùng em khám phá thế giới Tin học lớp 3-4-5</p>
-        <!-- Auth Entry Button (added v2.7.3) -->
-        <div class="flex justify-center mt-3 mb-1" id="auth-entry-wrap">
-          <button id="auth-open-btn"
-                  class="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold shadow btn-hover flex items-center gap-2">
-            <span>🔒</span><span>Đăng Nhập/Đăng Ký</span>
-          </button>
-        </div>
-<!-- Account area (visible when logged in) -->
-<div id="account-area" class="hidden mt-3 flex justify-center">
-  <div class="flex items-center gap-3 bg-white/90 backdrop-blur rounded-full shadow px-3 py-2 border border-gray-200">
-    <img id="acc-avatar" src="data/images/logo-bear-64.png" alt="avatar" class="w-8 h-8 rounded-full ring-2 ring-blue-100">
-    <div class="leading-tight">
-      <div id="acc-name" class="font-bold text-gray-800 text-sm">Học sinh</div>
-      <div id="acc-meta" class="text-xs text-gray-600">Khối • Lớp</div>
-    </div>
-    <button id="acc-settings" class="text-xs ml-1 px-3 py-1 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none">Cài đặt</button>
-    <button id="acc-logout" class="text-xs px-3 py-1 rounded-full bg-gray-200 hover:bg-gray-300 focus:outline-none">Đăng xuất</button>
-  </div>
+<!-- Trình phát âm thanh ẩn cho TTS -->
+<audio id="tts-audio" style="display: none;"></audio>
+<!-- ======================================================= -->
+<!-- ==== TRANG CHỦ (MODULE CHỌN LỚP & CHỨC NĂNG) ==== -->
+<!-- ======================================================= -->
+<div class="page-container" id="page-home">
+<!-- 1. Header (Logo và Tiêu đề) -->
+<header class="flex flex-col items-center justify-center mb-10">
+<!-- (MỚI) Brand Header (Trường TH Võng La) -->
+<div class="flex items-center gap-3 mb-4">
+<img alt="Logo Trường TH Võng La" class="w-16 h-16 rounded-full border-2 border-white shadow-md" src="data/images/logo.jpg"/>
+<span class="text-3xl font-extrabold text-blue-800">Trường Tiểu Học Võng La</span>
 </div>
-
-
-        </header>
-
-        <!-- 2. Main Content Grid -->
-        <main class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
-            
-            <!-- Cột 1: Chọn Lớp -->
-            <div class="flex flex-col space-y-5">
-                <button class="grade-btn btn-hover active-grade" data-grade="Lớp 3">LỚP 3</button>
-                <button class="grade-btn btn-hover" data-grade="Lớp 4">LỚP 4</button>
-                <button class="grade-btn btn-hover" data-grade="Lớp 5">LỚP 5</button>
-            </div>
-
-            <!-- Cột 2: Nút chức năng 1 -->
-            <div class="flex flex-col space-y-6">
-                <!-- Video học -->
-                <button class="menu-btn btn-hover bg-red-400 hover:bg-red-500 shadow-lg shadow-red-200" onclick="showPage('page-video')">
-                    <span class="icon-emoji">📚</span>
+<!-- SVG Logo -->
+<svg class="w-24 h-24" fill="none" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<circle cx="50" cy="50" fill="#FDE047" r="45"></circle>
+<defs><clippath id="circle-clip"><circle cx="50" cy="50" r="45"></circle></clippath></defs>
+<path clip-path="url(#circle-clip)" d="M28 80 Q 50 70, 72 80 V 95 H 28 Z" fill="#3B82F6"></path>
+<circle cx="28" cy="28" fill="#C27803" r="12"></circle><circle cx="72" cy="28" fill="#C27803" r="12"></circle>
+<circle cx="50" cy="55" fill="#C27803" r="28"></circle>
+<circle cx="30" cy="30" fill="#FCD34D" r="7"></circle><circle cx="70" cy="30" fill="#FCD34D" r="7"></circle>
+<circle cx="42" cy="52" fill="#1F2937" r="3"></circle><circle cx="58" cy="52" fill="#1F2937" r="3"></circle>
+<ellipse cx="36" cy="62" fill="#F472B6" fill-opacity="0.6" rx="5" ry="3"></ellipse><ellipse cx="64" cy="62" fill="#F472B6" fill-opacity="0.6" rx="5" ry="3"></ellipse>
+<path d="M48 62 L 52 62 L 50 65 Z" fill="#1F2937"></path>
+<path d="M44 70 Q 50 74, 56 70" fill="none" stroke="#1F2937" stroke-linecap="round" stroke-width="2"></path>
+</svg>
+<h1 class="text-3xl md:text-5xl font-extrabold text-blue-700 mt-4 text-center">Gấu Con Học Tin</h1>
+<p class="text-xl md:text-2xl text-blue-600 font-medium text-center">Trợ lý học tập thông minh</p>
+<p class="text-base md:text-lg text-gray-600 mt-1 text-center">Cùng em khám phá thế giới Tin học lớp 3-4-5</p>
+<!-- Auth Entry Button (added v2.7.3) -->
+<div class="flex justify-center mt-3 mb-1" id="auth-entry-wrap">
+<button class="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold shadow btn-hover flex items-center gap-2" id="auth-open-btn">
+<span>🔒</span><span>Đăng Nhập/Đăng Ký</span>
+</button>
+</div>
+<!-- Account area (visible when logged in) -->
+<div class="hidden mt-3 flex justify-center" id="account-area">
+<div class="flex items-center gap-3 bg-white/90 backdrop-blur rounded-full shadow px-3 py-2 border border-gray-200">
+<img alt="avatar" class="w-8 h-8 rounded-full ring-2 ring-blue-100 bear-image-bright" id="acc-avatar" src="data/images/logo-bear-64.png"/>
+<div class="leading-tight">
+<div class="font-bold text-gray-800 text-sm" id="acc-name">Học sinh</div>
+<div class="text-xs text-gray-600" id="acc-meta">Khối • Lớp</div>
+</div>
+<button class="text-xs ml-1 px-3 py-1 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none" id="acc-settings">Cài đặt</button>
+<button class="text-xs px-3 py-1 rounded-full bg-gray-200 hover:bg-gray-300 focus:outline-none" id="acc-logout">Đăng xuất</button>
+</div>
+</div>
+</header>
+<!-- 2. Main Content Grid -->
+<main class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+<!-- Cột 1: Chọn Lớp -->
+<div class="flex flex-col space-y-5">
+<button class="grade-btn btn-hover active-grade" data-grade="Lớp 3">LỚP 3</button>
+<button class="grade-btn btn-hover" data-grade="Lớp 4">LỚP 4</button>
+<button class="grade-btn btn-hover" data-grade="Lớp 5">LỚP 5</button>
+</div>
+<!-- Cột 2: Nút chức năng 1 -->
+<div class="flex flex-col space-y-6">
+<!-- Video học -->
+<button class="menu-btn btn-hover bg-red-400 hover:bg-red-500 shadow-lg shadow-red-200" onclick="showPage('page-video')">
+<span class="icon-emoji">🎥</span>
                     Video học
                 </button>
-                <!-- Trò chơi mini -->
-                <button class="menu-btn btn-hover bg-green-500 hover:bg-green-600 shadow-lg shadow-green-200" onclick="showPage('page-game')">
-                    <span class="icon-emoji">🎯</span>
+<!-- Trò chơi mini -->
+<button class="menu-btn btn-hover bg-green-500 hover:bg-green-600 shadow-lg shadow-green-200" onclick="showPage('page-game')">
+<span class="icon-emoji">🎯</span>
                     Trò chơi mini
                 </button>
-            </div>
-
-            <!-- Cột 3: Nút chức năng 2 -->
-            <div class="flex flex-col space-y-6">
-                <!-- Phiếu bài tập -->
-                <button class="menu-btn btn-hover bg-yellow-500 hover:bg-yellow-600 shadow-lg shadow-yellow-200" onclick="showPage('page-quiz')">
-                    <span class="icon-emoji">🧠</span>
+</div>
+<!-- Cột 3: Nút chức năng 2 -->
+<div class="flex flex-col space-y-6">
+<!-- Phiếu bài tập -->
+<button class="menu-btn btn-hover bg-yellow-500 hover:bg-yellow-600 shadow-lg shadow-yellow-200" onclick="showPage('page-quiz')">
+<span class="icon-emoji">🧠</span>
                     Phiếu bài tập
                 </button>
-                <!-- Kết quả học tập -->
-                <button class="menu-btn btn-hover bg-purple-500 hover:bg-purple-600 shadow-lg shadow-purple-200" onclick="showPage('page-results')">
-                    <span class="icon-emoji">📈</span>
+<!-- Kết quả học tập -->
+<button class="menu-btn btn-hover bg-purple-500 hover:bg-purple-600 shadow-lg shadow-purple-200" onclick="showPage('page-results')">
+<span class="icon-emoji">📈</span>
                     Kết quả học tập
                 </button>
-
-                <!-- Bảng xếp hạng -->
-                <!-- Nút BXH được thiết kế riêng: biểu tượng cúp lớn và chữ đậm dễ nhìn cho học sinh tiểu học -->
-                <!-- Bảng xếp hạng: thẻ card lớn với cúp và nhãn. Chọn màu vàng tươi và bo tròn lớn cho phù hợp học sinh tiểu học -->
-                <button id="p2-scoreboard-card" type="button" onclick="p2ShowLeaderboard()" class="menu-btn btn-hover bg-amber-400 hover:bg-amber-500 shadow-lg shadow-amber-300 rounded-2xl flex flex-col items-center justify-center gap-2 py-6">
-                    <span class="text-5xl leading-none">🏆</span>
-                    <span class="text-xl font-extrabold">Bảng Xếp Hạng</span>
-                </button>
-            </div>
-        </main>
-
-        
-    </div> <!-- Kết thúc page-home -->
-
-    <!-- ======================================================= -->
-    <!-- ==== MODULE 1: VIDEO BÀI HỌC (ẨN) ==== -->
-    <!-- ======================================================= -->
-    <div id="page-video" class="page-container hidden max-w-6xl mx-auto">
-        <!-- Header của module -->
-        <header class="flex items-center mb-8">
-            <button class="back-btn btn-hover text-3xl md:text-5xl p-2 rounded-full hover:bg-black/10">👈</button>
-            <h1 id="video-page-title" class="text-2xl md:text-4xl font-extrabold text-blue-700 ml-4">📚 Video Bài Học</h1>
-        </header>
-        <!-- Lưới video -->
-        <div id="video-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-    </div> <!-- Kết thúc page-video -->
-
-    <!-- ======================================================= -->
-    <!-- ==== MODULE 2: PHIẾU BÀI TẬP (ẨN) ==== -->
-    <!-- ======================================================= -->
-    <!-- ======================================================= -->
-    <!-- ==== MODULE 2: PHIẾU BÀI TẬP (V2.5.1 - ẨN) ==== -->
-    <!-- ======================================================= -->
-    <div id="page-quiz" class="page-container hidden max-w-4xl mx-auto">
-        <!-- Header của module -->
-        <header class="flex items-center mb-8">
-            <button class="back-btn btn-hover text-3xl md:text-5xl p-2 rounded-full hover:bg-black/10">👈</button>
-            <h1 id="quiz-page-title" class="text-2xl md:text-4xl font-extrabold text-blue-700 ml-4">🧠 Phiếu Bài Tập</h1>
-        </header>
-
-        <!-- (MỚI V2.5.1) Màn hình chọn bài -->
-        <div id="quiz-lesson-selection" class="space-y-4">
-            <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">Em hãy chọn bài học:</h2>
-            <!-- Danh sách bài tập sẽ được JS chèn vào đây -->
-        </div>
-
-        <!-- (MỚI V2.5.1) Thẻ làm bài (ẩn ban đầu) -->
-        <div class="bg-white/80 p-4 md:p-6 rounded-3xl shadow-xl backdrop-blur-sm relative hidden" id="quiz-card">
-    <!-- Popup Bảng Tổng Kết (MỚI) -->
-    <div id="summary-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center transform scale-100 transition-transform duration-300">
-            <h2 class="text-3xl font-extrabold text-blue-700 mb-4">Bảng Tổng Kết</h2>
-            <p id="summary-popup-content" class="text-xl font-medium p-4 rounded-xl bg-blue-100 text-blue-800 whitespace-pre-line mb-6"></p>
-            <button id="summary-popup-close" class="btn-hover w-full p-4 bg-blue-600 text-white rounded-xl font-bold text-lg" onclick="document.getElementById('summary-popup').classList.add('hidden'); updatePageContent('page-quiz');">ĐÓNG</button>
-        </div>
-    </div>
-            <!-- Header của Thẻ Bài -->
-            <div class="mb-4">
-                <div class="text-gray-500 font-medium text-sm" id="quiz-topic">Bài 1: Thông tin và quyết định</div>
-                <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                    <div id="quiz-progress" class="bg-blue-500 h-2.5 rounded-full" style="width: 0%"></div>
-                </div>
-                <div class="text-blue-600 font-bold text-lg mt-1" id="quiz-level">MỨC 1: NHẬN BIẾT 🎯</div>
-            </div>
-
-            <!-- (MỚI V2.5.1) Đồng hồ bấm giờ (Stopwatch) -->
-            <div class="absolute top-4 left-4 text-xl font-bold text-gray-800 bg-white/70 px-4 py-2 rounded-xl shadow-md">
-                <span id="quiz-stopwatch">00:00</span>
-            </div>
-
-            <!-- Nút Loa (Giữ nguyên id) -->
-            <button id="speak-button" class="btn-hover absolute top-4 right-4 text-3xl md:text-4xl p-2 rounded-full hover:bg-blue-200">🔈</button>
-
-            <!-- Câu hỏi chính (Giữ nguyên id) -->
-            <h2 id="question-text" class="text-2xl md:text-3xl font-bold text-gray-900 my-6 min-h-[4rem]">
+<!-- Bảng xếp hạng -->
+<!-- Nút BXH được thiết kế riêng: biểu tượng cúp lớn và chữ đậm dễ nhìn cho học sinh tiểu học -->
+<!-- Bảng xếp hạng: thẻ card lớn với cúp và nhãn. Chọn màu vàng tươi và bo tròn lớn cho phù hợp học sinh tiểu học -->
+<button class="menu-btn btn-hover bg-amber-400 hover:bg-amber-500 shadow-lg shadow-amber-300 rounded-2xl flex flex-col items-center justify-center gap-2 py-6" id="p2-scoreboard-card" onclick="p2ShowLeaderboard()" type="button">
+<span class="text-5xl leading-none">🏆</span>
+<span class="text-xl font-extrabold">Bảng Xếp Hạng</span>
+</button>
+</div>
+</main>
+</div> <!-- Kết thúc page-home -->
+<!-- ======================================================= -->
+<!-- ==== MODULE 1: VIDEO BÀI HỌC (ẨN) ==== -->
+<!-- ======================================================= -->
+<div class="page-container hidden max-w-6xl mx-auto" id="page-video">
+<!-- Header của module -->
+<header class="flex items-center mb-8">
+<button class="back-btn btn-hover text-3xl md:text-5xl p-2 rounded-full hover:bg-black/10">👈</button>
+<h1 class="text-2xl md:text-4xl font-extrabold text-blue-700 ml-4" id="video-page-title">📚 Video Bài Học</h1>
+</header>
+<!-- Lưới video -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="video-grid-container"></div>
+</div> <!-- Kết thúc page-video -->
+<!-- ======================================================= -->
+<!-- ==== MODULE 2: PHIẾU BÀI TẬP (ẨN) ==== -->
+<!-- ======================================================= -->
+<!-- ======================================================= -->
+<!-- ==== MODULE 2: PHIẾU BÀI TẬP (V2.5.1 - ẨN) ==== -->
+<!-- ======================================================= -->
+<div class="page-container hidden max-w-4xl mx-auto" id="page-quiz">
+<!-- Header của module -->
+<header class="flex items-center mb-8">
+<button class="back-btn btn-hover text-3xl md:text-5xl p-2 rounded-full hover:bg-black/10">👈</button>
+<h1 class="text-2xl md:text-4xl font-extrabold text-blue-700 ml-4" id="quiz-page-title">🧠 Phiếu Bài Tập</h1>
+</header>
+<!-- (MỚI V2.5.1) Màn hình chọn bài -->
+<div class="space-y-4" id="quiz-lesson-selection">
+<h2 class="text-2xl font-bold text-center text-blue-800 mb-6">Em hãy chọn bài học:</h2>
+<!-- Danh sách bài tập sẽ được JS chèn vào đây -->
+</div>
+<!-- (MỚI V2.5.1) Thẻ làm bài (ẩn ban đầu) -->
+<div class="bg-white/80 p-4 md:p-6 rounded-3xl shadow-xl backdrop-blur-sm relative hidden" id="quiz-card">
+<!-- Popup Bảng Tổng Kết (MỚI) -->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="summary-popup">
+<div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center transform scale-100 transition-transform duration-300">
+<h2 class="text-3xl font-extrabold text-blue-700 mb-4">Bảng Tổng Kết</h2>
+<p class="text-xl font-medium p-4 rounded-xl bg-blue-100 text-blue-800 whitespace-pre-line mb-6" id="summary-popup-content"></p>
+<button class="btn-hover w-full p-4 bg-blue-600 text-white rounded-xl font-bold text-lg" id="summary-popup-close" onclick="document.getElementById('summary-popup').classList.add('hidden'); updatePageContent('page-quiz');">ĐÓNG</button>
+</div>
+</div>
+<!-- Header của Thẻ Bài -->
+<div class="mb-4">
+<div class="text-gray-500 font-medium text-sm" id="quiz-topic">Bài 1: Thông tin và quyết định</div>
+<div class="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+<div class="bg-blue-500 h-2.5 rounded-full" id="quiz-progress" style="width: 0%"></div>
+</div>
+<div class="text-blue-600 font-bold text-lg mt-1" id="quiz-level">MỨC 1: NHẬN BIẾT 🎯</div>
+</div>
+<!-- (MỚI V2.5.1) Đồng hồ bấm giờ (Stopwatch) -->
+<div class="absolute top-4 left-4 text-xl font-bold text-gray-800 bg-white/70 px-4 py-2 rounded-xl shadow-md">
+<span id="quiz-stopwatch">00:00</span>
+</div>
+<!-- Nút Loa (Giữ nguyên id) -->
+<button class="btn-hover absolute top-4 right-4 text-3xl md:text-4xl p-2 rounded-full hover:bg-blue-200" id="speak-button">🔈</button>
+<!-- Câu hỏi chính (Giữ nguyên id) -->
+<h2 class="text-2xl md:text-3xl font-bold text-gray-900 my-6 min-h-[4rem]" id="question-text">
                 Câu hỏi sẽ hiển thị ở đây
             </h2>
-
-            <!-- Khu vực Đáp án (JS render) -->
-            <div id="quiz-answer-area" class="min-h-[240px]"></div>
-
-            <!-- Phản hồi -->
-            <div id="feedback-message" class="hidden mt-6 text-xl font-medium p-4 rounded-xl"></div>
-
-            <!-- Nút Câu tiếp theo -->
-            <button id="next-question-btn" class="hidden btn-hover mt-6 w-full p-4 bg-blue-600 text-white rounded-xl font-bold text-lg">Tiếp theo ➔</button>
-        </div>
-
-        <!-- Hiệu ứng Pháo hoa toàn màn hình (ẩn) -->
-        <div id="correct-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-            <div class="text-white text-6xl font-bold text-center animate-bounce">
+<!-- Khu vực Đáp án (JS render) -->
+<div class="min-h-[240px]" id="quiz-answer-area"></div>
+<!-- Phản hồi -->
+<div class="hidden mt-6 text-xl font-medium p-4 rounded-xl" id="feedback-message"></div>
+<!-- Nút Câu tiếp theo -->
+<button class="hidden btn-hover mt-6 w-full p-4 bg-blue-600 text-white rounded-xl font-bold text-lg" id="next-question-btn">Tiếp theo ➔</button>
+</div>
+<!-- Hiệu ứng Pháo hoa toàn màn hình (ẩn) -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" id="correct-overlay">
+<div class="text-white text-6xl font-bold text-center animate-bounce">
                 TUYỆT VỜI! 🥳
                 <div class="text-4xl">🎉✨🎉</div>
-            </div>
-        </div>
-    </div> <!-- Kết thúc page-quiz -->
-
-    <!-- ======================================================= -->
-    <!-- ==== MODULE 3: TRÒ CHƠI MINI (ẨN) ==== -->
-    <!-- ======================================================= -->
-    
-    <!-- ======================================================= -->
-    <!-- ==== MODULE 3: TRÒ CHƠI MINI (ĐÃ NÂNG CẤP) ==== -->
-    <!-- ======================================================= -->
-    <div id="page-game" class="page-container hidden max-w-5xl mx-auto">
-        <!-- Header -->
-        <header class="flex items-center mb-6">
-            <button class="back-btn btn-hover text-3xl md:text-5xl p-2 rounded-full hover:bg-black/10">👈</button>
-            <h1 id="game-page-title" class="text-2xl md:text-4xl font-extrabold text-blue-700 ml-4">🎯 Mini Game Ôn Tập</h1>
-        </header>
-
-        <!-- Khối chọn lớp + danh sách game -->
-        <div class="bg-white/80 p-6 md:p-8 rounded-3xl shadow-xl backdrop-blur-sm">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-                <div>
-                    <h3 class="text-xl font-bold">Chọn mini game theo <span id="game-grade-label" class="text-blue-700">Lớp 3</span></h3>
-                    <p class="text-sm text-gray-600">Bấm vào thẻ để bắt đầu chơi – tích điểm & nhận sao.</p>
-                </div>
-                <div class="flex gap-2">
-                    <button class="game-grade-btn btn-hover px-4 py-2 rounded-full border-2 border-blue-300 text-blue-700 bg-white" data-grade="Lớp 3">Lớp 3</button>
-                    <button class="game-grade-btn btn-hover px-4 py-2 rounded-full border-2 border-blue-300 text-blue-700 bg-white" data-grade="Lớp 4">Lớp 4</button>
-                    <button class="game-grade-btn btn-hover px-4 py-2 rounded-full border-2 border-blue-300 text-blue-700 bg-white" data-grade="Lớp 5">Lớp 5</button>
-                </div>
-            </div>
-
-            <!-- Danh sách game -->
-            <div id="game-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-
-            <!-- Khu vực chơi game (ẩn ban đầu) -->
-            <div id="game-play" class="hidden mt-6">
-                <div class="flex items-center justify-between mb-3">
-                    <button id="game-back-list" class="btn-hover px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 border">← Danh sách</button>
-                    <div class="flex items-center gap-4 text-sm">
-                        <span>Điểm: <b id="game-score">0</b></span>
-                        <span>Mạng: <b id="game-lives">3</b></span>
-                        <span>Thời gian: <b id="game-timer">--</b></span>
-                    </div>
-                </div>
-
-                <!-- Đường đua (chỉ dùng cho game kiểu đua xe/flash) -->
-                <div id="race-wrap" class="mb-4 hidden">
-                    <h3 class="text-base font-semibold text-center mb-2">Gấu 🐻 vs Thỏ 🐰</h3>
-                    <div id="race-track" class="w-full h-24 rounded-lg overflow-hidden relative mb-2">
-                        <div id="player-bear" class="racer" style="transform: translateX(0px);">🐻</div>
-                        <div id="player-rabbit" class="racer" style="transform: translateX(0px);">🐰</div>
-                        <div class="finish-line">🏁</div>
-                    </div>
-                </div>
-
-                <!-- Câu hỏi -->
-                <h2 id="game-question-text" class="text-xl md:text-2xl font-bold text-gray-900 mb-4">Câu hỏi</h2>
-
-                <!-- Sân chơi -->
-                <div id="game-stage" class="min-h-[200px]"></div>
-
-                <!-- Phản hồi -->
-                <div id="game-feedback" class="hidden mt-4 text-lg font-medium p-4 rounded-xl"></div>
-
-                <!-- Nút tiếp theo -->
-                <button id="game-next" class="hidden btn-hover mt-4 w-full p-3 bg-blue-600 text-white rounded-xl font-bold">Câu tiếp theo ➔</button>
-            </div>
-        </div>
-
-        <!-- Popup Tổng kết -->
-        <div id="game-summary" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-            <div class="bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl text-center">
-                <h3 class="text-2xl font-extrabold text-blue-700 mb-2">Tổng kết lượt chơi</h3>
-                <p id="game-summary-text" class="text-lg text-gray-700 mb-4 whitespace-pre-line"></p>
-                <button id="game-summary-close" class="btn-hover w-full p-3 bg-blue-600 text-white rounded-xl font-bold">Đóng</button>
-            </div>
-        </div>
-    </div> <!-- Kết thúc page-game -->
-
-    
-    <!-- ======================================================= -->
-    <!-- ==== MODULE 4: KẾT QUẢ HỌC TẬP (ẨN) ==== -->
-    <!-- ======================================================= -->
-    <div id="page-results" class="page-container hidden max-w-4xl mx-auto">
-        <!-- Header của module -->
-        <header class="flex items-center mb-8">
-            <button class="back-btn btn-hover text-3xl md:text-5xl p-2 rounded-full hover:bg-black/10">👈</button>
-            <h1 id="results-page-title" class="text-2xl md:text-4xl font-extrabold text-blue-700 ml-4">📈 Kết Quả Học Tập</h1>
-        </header>
-
-        <!-- Lưới kết quả -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Thẻ Tổng sao -->
-            <div class="flex items-center p-6 bg-gradient-to-r from-yellow-300 to-orange-400 rounded-2xl shadow-lg text-white">
-                <span class="text-6xl mr-4">🌟</span>
-                <div>
-                    <div class="text-5xl font-bold" id="stars-count">125</div>
-                    <div class="text-xl font-medium">Tổng số sao</div>
-                </div>
-            </div>
-            <!-- Thẻ Bài đã làm -->
-            <div class="flex items-center p-6 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-2xl shadow-lg text-white">
-                <span class="text-6xl mr-4">📝</span>
-                <div>
-                    <div class="text-5xl font-bold" id="completed-count">15</div>
-                    <div class="text-xl font-medium">Bài đã làm</div>
-                </div>
-            </div>
-            <!-- Thẻ Tỷ lệ đúng -->
-            <div class="flex items-center p-6 bg-gradient-to-r from-green-400 to-cyan-500 rounded-2xl shadow-lg text-white">
-                <span class="text-6xl mr-4">🎯</span>
-                <div>
-                    <div class="text-5xl font-bold" id="accuracy-percent">85%</div>
-                    <div class="text-xl font-medium">Tỷ lệ đúng</div>
-                </div>
-            </div>
-            <!-- Thẻ Thành tích -->
-            <div class="flex items-center p-6 bg-gradient-to-r from-pink-400 to-red-500 rounded-2xl shadow-lg text-white">
-                <span class="text-6xl mr-4">🏆</span>
-                <div>
-                    <div class="text-5xl font-bold" id="trophy-count">3</div>
-                    <div class="text-xl font-medium">Thành tích</div>
-                </div>
-            </div>
-        </div>
-    </div> <!-- Kết thúc page-results -->
-
-
-    <!-- ======================= JAVASCRIPT ======================= -->
-    
+</div>
+</div>
+</div> <!-- Kết thúc page-quiz -->
+<!-- ======================================================= -->
+<!-- ==== MODULE 3: TRÒ CHƠI MINI (ẨN) ==== -->
+<!-- ======================================================= -->
+<!-- ======================================================= -->
+<!-- ==== MODULE 3: TRÒ CHƠI MINI (ĐÃ NÂNG CẤP) ==== -->
+<!-- ======================================================= -->
+<div class="page-container hidden max-w-5xl mx-auto" id="page-game">
+<!-- Header -->
+<header class="flex items-center mb-6">
+<button class="back-btn btn-hover text-3xl md:text-5xl p-2 rounded-full hover:bg-black/10">👈</button>
+<h1 class="text-2xl md:text-4xl font-extrabold text-blue-700 ml-4" id="game-page-title">🎯 Mini Game Ôn Tập</h1>
+</header>
+<!-- Khối chọn lớp + danh sách game -->
+<div class="bg-white/80 p-6 md:p-8 rounded-3xl shadow-xl backdrop-blur-sm">
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+<div>
+<h3 class="text-xl font-bold">Chọn mini game theo <span class="text-blue-700" id="game-grade-label">Lớp 3</span></h3>
+<p class="text-sm text-gray-600">Bấm vào thẻ để bắt đầu chơi – tích điểm &amp; nhận sao.</p>
+</div>
+<div class="flex gap-2">
+<button class="game-grade-btn btn-hover px-4 py-2 rounded-full border-2 border-blue-300 text-blue-700 bg-white" data-grade="Lớp 3">Lớp 3</button>
+<button class="game-grade-btn btn-hover px-4 py-2 rounded-full border-2 border-blue-300 text-blue-700 bg-white" data-grade="Lớp 4">Lớp 4</button>
+<button class="game-grade-btn btn-hover px-4 py-2 rounded-full border-2 border-blue-300 text-blue-700 bg-white" data-grade="Lớp 5">Lớp 5</button>
+</div>
+</div>
+<!-- Danh sách game -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="game-list"></div>
+<!-- Khu vực chơi game (ẩn ban đầu) -->
+<div class="hidden mt-6" id="game-play">
+<div class="flex items-center justify-between mb-3">
+<button class="btn-hover px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 border" id="game-back-list">← Danh sách</button>
+<div class="flex items-center gap-4 text-sm">
+<span>Điểm: <b id="game-score">0</b></span>
+<span>Mạng: <b id="game-lives">3</b></span>
+<span>Thời gian: <b id="game-timer">--</b></span>
+</div>
+</div>
+<!-- Đường đua (chỉ dùng cho game kiểu đua xe/flash) -->
+<div class="mb-4 hidden" id="race-wrap">
+<h3 class="text-base font-semibold text-center mb-2">Gấu 🐻 vs Thỏ 🐰</h3>
+<div class="w-full h-24 rounded-lg overflow-hidden relative mb-2" id="race-track">
+<div class="racer" id="player-bear" style="transform: translateX(0px);">🐻</div>
+<div class="racer" id="player-rabbit" style="transform: translateX(0px);">🐰</div>
+<div class="finish-line">🏁</div>
+</div>
+</div>
+<!-- Câu hỏi -->
+<h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-4" id="game-question-text">Câu hỏi</h2>
+<!-- Sân chơi -->
+<div class="min-h-[200px]" id="game-stage"></div>
+<!-- Phản hồi -->
+<div class="hidden mt-4 text-lg font-medium p-4 rounded-xl" id="game-feedback"></div>
+<!-- Nút tiếp theo -->
+<button class="hidden btn-hover mt-4 w-full p-3 bg-blue-600 text-white rounded-xl font-bold" id="game-next">Câu tiếp theo ➔</button>
+</div>
+</div>
+<!-- Popup Tổng kết -->
+<div class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" id="game-summary">
+<div class="bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl text-center">
+<h3 class="text-2xl font-extrabold text-blue-700 mb-2">Tổng kết lượt chơi</h3>
+<p class="text-lg text-gray-700 mb-4 whitespace-pre-line" id="game-summary-text"></p>
+<button class="btn-hover w-full p-3 bg-blue-600 text-white rounded-xl font-bold" id="game-summary-close">Đóng</button>
+</div>
+</div>
+</div> <!-- Kết thúc page-game -->
+<!-- ======================================================= -->
+<!-- ==== MODULE 4: KẾT QUẢ HỌC TẬP (ẨN) ==== -->
+<!-- ======================================================= -->
+<div class="page-container hidden max-w-4xl mx-auto" id="page-results">
+<!-- Header của module -->
+<header class="flex items-center mb-8">
+<button class="back-btn btn-hover text-3xl md:text-5xl p-2 rounded-full hover:bg-black/10">👈</button>
+<h1 class="text-2xl md:text-4xl font-extrabold text-blue-700 ml-4" id="results-page-title">📈 Kết Quả Học Tập</h1>
+</header>
+<!-- Kết quả học tập mới: đồng bộ với bảng xếp hạng -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" id="results-stats">
+<!-- Điểm hôm nay (daily points) -->
+<div class="p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-center">
+<div class="text-sm text-gray-600 mb-1">Điểm hôm nay</div>
+<div class="relative h-3 bg-yellow-100 rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-yellow-400 rounded-full" id="rs-progress-bar" style="width:0%"></div>
+</div>
+<div class="text-xs mt-1" id="rs-progress-text">0 / 0</div>
+</div>
+<!-- Tổng điểm cao nhất (sum of best scores per quiz) -->
+<div class="p-4 bg-green-50 border border-green-200 rounded-xl text-center">
+<div class="text-sm text-gray-600 mb-1">Tổng điểm cao nhất</div>
+<div class="text-lg font-bold" id="rs-best-points">—</div>
+<div class="text-xs text-gray-500">Tổng điểm từ các bài cao nhất</div>
+</div>
+<!-- Bài đã làm -->
+<div class="p-4 bg-blue-50 border border-blue-200 rounded-xl text-center">
+<div class="text-sm text-gray-600 mb-1">Bài đã làm</div>
+<div class="text-lg font-bold" id="rs-completed">0</div>
+</div>
+<!-- Tỷ lệ đúng -->
+<div class="p-4 bg-purple-50 border border-purple-200 rounded-xl text-center">
+<div class="text-sm text-gray-600 mb-1">Tỷ lệ đúng</div>
+<div class="text-lg font-bold" id="rs-accuracy">0%</div>
+</div>
+</div>
+</div> <!-- Kết thúc page-results -->
+<!-- ======================= JAVASCRIPT ======================= -->
 <script>// === v2.5.7-stable runtime guards ===
 (function(){
   function panic(e){
@@ -634,6 +594,41 @@ document.querySelectorAll('.back-btn').forEach(b=> b.addEventListener('click', (
 const LOCAL_VIDEO_MAX = 60;
 const pad2 = n=>String(n).padStart(2,'0');
 const gradeToFolder = g => (g==='Lớp 3'?'lop3':(g==='Lớp 4'?'lop4':(g==='Lớp 5'?'lop5':'lop3')));
+
+// === Added: Video lesson titles by grade ===
+const VIDEO_TITLES = {
+  "Lớp 3": [
+    "Bài 1. Thông tin và quyết định",
+    "Bài 2. Xử lí thông tin",
+    "Bài 3. Máy tính và em",
+    "Bài 4. Làm việc với máy tính",
+    "Bài 5. Sử dụng bàn phím",
+    "Bài 6. Khám phá thông tin trên Internet",
+    "Bài 7. Sắp xếp để dễ tìm",
+    "Bài 8. Sơ đồ hình cây, tổ chức thông tin trong máy tính"
+  ],
+  "Lớp 4": [
+    "Bài 1: Phần cứng và phần mềm máy tính",
+    "Bài 2: Gõ bàn phím đúng cách",
+    "Bài 3: Thông tin trên trang web",
+    "Bài 4: Tìm kiếm thông tin trên internet",
+    "Bài 5: Thao tác với tệp và thư mục",
+    "Bài 6: Sử dụng phần mềm khi được phép",
+    "Bài 7: Tạo bài trình chiếu",
+    "Bài 8: Định dạng văn bản trên trang chiếu"
+  ],
+  "Lớp 5": [
+    "1. Em có thể làm gì với máy tính?",
+    "2. Tìm kiếm thông tin trên website",
+    "3. Tìm kiếm thông tin trong giải quyết vấn đề",
+    "4. Cây thư mục",
+    "5. Bản quyền nội dung thông tin",
+    "6. Định dạng kí tự và bố trí hình ảnh trong văn bản",
+    "7. Thực hành soạn thảo văn bản",
+    "8A. Làm quen với phần mềm đồ họa"
+  ]
+};
+
 function loadVideoContent(){
   const grid = document.getElementById('video-grid-container'); if(!grid) return;
   grid.innerHTML='';
@@ -649,7 +644,12 @@ function loadVideoContent(){
       if(!didError){
         wrap.appendChild(v);
         const body=document.createElement('div'); body.className='p-4';
-        body.innerHTML='<h3 class="font-bold text-lg text-gray-800">Bài '+i+'</h3><p class="text-gray-600 text-sm">Thư mục: '+folder+'</p>';
+        body.innerHTML = (function(){
+  const list = (VIDEO_TITLES[currentGrade]||[]);
+  const title = list[i-1] || ('Bài ' + i);
+  return '<h3 class="font-bold text-lg text-gray-800">'+title+'</h3>' +
+         '<p class="text-gray-600 text-sm">Thư mục: '+folder+'</p>';
+})();
         card.appendChild(wrap); card.appendChild(body); grid.appendChild(card); any=true;
       }
     },100);
@@ -659,13 +659,64 @@ function loadVideoContent(){
 
 // ====== Kết quả học tập ======
 function renderResultsPage(){
-  const s = userScores[currentGrade] || {totalStars:0,completedCount:0,correctAnswers:0,totalAnswers:0};
-  const acc = s.totalAnswers ? Math.round((s.correctAnswers/s.totalAnswers)*100) : 0;
-  const el=id=>document.getElementById(id);
-  if(el('stars-count')) el('stars-count').innerText = s.totalStars||0;
-  if(el('completed-count')) el('completed-count').innerText = s.completedCount||0;
-  if(el('accuracy-percent')) el('accuracy-percent').innerText = acc+'%';
-  if(el('trophy-count')) el('trophy-count').innerText = 0;
+  // Always load scores from localStorage to ensure latest data
+  try { loadScores(); } catch(_e){}
+  // Get current grade stats from userScores (fallback to zeros)
+  var s = (window.userScores && window.userScores[currentGrade]) || { totalStars:0, completedCount:0, correctAnswers:0, totalAnswers:0 };
+  var completed = s.completedCount || 0;
+  var accPct    = (s.totalAnswers ? Math.round((s.correctAnswers / s.totalAnswers) * 100) : 0);
+  // Update local stat cards
+  var compEl = document.getElementById('rs-completed');
+  if(compEl) compEl.textContent = completed;
+  var accEl  = document.getElementById('rs-accuracy');
+  if(accEl)  accEl.textContent  = accPct + '%';
+  // Reset progress and best points before fetching
+  var bar    = document.getElementById('rs-progress-bar');
+  var barTxt = document.getElementById('rs-progress-text');
+  var bestEl = document.getElementById('rs-best-points');
+  if(bar)    bar.style.width = '0%';
+  if(barTxt) barTxt.textContent = '0 / 0';
+  if(bestEl) bestEl.textContent = '—';
+  // Fetch user info via whoami to obtain token, grade and student_id
+  var auth = null;
+  try { auth = getAuth(); } catch(_e2){}
+  var token = auth && auth.token;
+  if(!token){ return; }
+  // Call whoami via apiPost (returns student_id and grade)
+  apiPost('whoami', { token: token }).then(function(me){
+    if(!me || !me.ok){ return; }
+    var grade      = String(me.grade || '');
+    var student_id = String(me.student_id || '');
+    // Fetch daily leaderboard to get today's points
+    apiPost('leaderboard', { token: token, scope:'daily', limit:50 }).then(function(dailyRes){
+      var today = 0;
+      try{
+        var rows = (dailyRes && (dailyRes.rows || dailyRes.data || dailyRes.items)) || [];
+        for(var i=0; i<rows.length; i++){
+          var row = rows[i];
+          if(String(row.student_id) === student_id){ today = Number(row.points || row.score_final || 0); break; }
+        }
+      }catch(_e3){}
+      // Determine daily cap based on grade (defaults to grade 4)
+      var capMap = { '3': 200, '4': 250, '5': 300 };
+      var cap    = capMap[grade] || capMap['4'];
+      var pct    = cap ? Math.min(100, Math.round((today / cap) * 100)) : 0;
+      if(bar)    bar.style.width = pct + '%';
+      if(barTxt) barTxt.textContent = today + ' / ' + cap;
+      // Fetch all-time leaderboard to get total (sum of best scores per quiz)
+      apiPost('leaderboard', { token: token, scope:'all', limit:50 }).then(function(allRes){
+        var bestPoints = 0;
+        try{
+          var rows2 = (allRes && (allRes.rows || allRes.data || allRes.items)) || [];
+          for(var j=0; j<rows2.length; j++){
+            var r2 = rows2[j];
+            if(String(r2.student_id) === student_id){ bestPoints = Number(r2.points || 0); break; }
+          }
+        }catch(_e4){}
+        if(bestEl) bestEl.textContent = bestPoints;
+      }).catch(function(){ /* ignore errors for all-time leaderboard */ });
+    }).catch(function(){ /* ignore errors for daily leaderboard */ });
+  }).catch(function(){ /* ignore errors for whoami */ });
 }
 
 // ====== QUIZ DATA (Bài 1: 15 câu – theo tài liệu) ======
@@ -2396,7 +2447,7 @@ if(qText) qText.addEventListener('mouseenter', ()=>speakText(qText.innerText));
 function updatePageContent(pageId){
   switch(pageId){
     case 'page-video':
-      document.getElementById('video-page-title').innerText = '📚 Video Bài Học - '+currentGrade;
+      document.getElementById('video-page-title').innerText = '🎥 Video Bài Học - '+currentGrade;
       loadVideoContent();
       break;
     case 'page-quiz':
@@ -2899,6 +2950,11 @@ async function showLessonSummary(){
     const total = currentLessonQuestions.length || 0;
     const correct = lessonCorrectAnswers || 0;
 
+    // Disable the next/submit button to prevent double submissions
+    try{
+      if(typeof nextBtn !== 'undefined' && nextBtn){ nextBtn.disabled = true; }
+    }catch(_){}
+
     // 1) Gửi submit_run nếu có run_id + token
     let awarded = 0, serverMsg = '';
     try{
@@ -2908,10 +2964,21 @@ async function showLessonSummary(){
         maxScore: total * 5 // cùng thang “sao” cũ: 5 điểm / câu đúng
       });
       if(r && r.ok){
+        // scoring API: gather awarded points, final score and accuracy
         awarded = Number(r.awarded_points || 0);
-        serverMsg = `( +${awarded} điểm hôm nay )`;
-      }else if(r && r.error){
-        serverMsg = `(không cộng điểm: ${r.error})`;
+        const finalScore = (r.score && typeof r.score.score_final !== 'undefined') ? r.score.score_final : 0;
+        const accPct = total > 0 ? Math.round((correct / total) * 100) : 0;
+        serverMsg = '';
+        serverMsg += 'Điểm cộng: ' + awarded + '\n';
+        serverMsg += 'Điểm số: ' + finalScore + '\n';
+        serverMsg += 'Độ chính xác: ' + accPct + '%\n';
+        if(r.policy && typeof r.policy.remaining_today !== 'undefined'){
+          serverMsg += 'Còn lại hôm nay: ' + r.policy.remaining_today;
+        }
+      }else if(r){
+        // show error or reject reason from server clearly
+        const err = r.error || r.reject || 'Lỗi không xác định';
+        serverMsg = 'Không cộng điểm: ' + err;
       }
     }catch(_){
       /* offline hoặc chưa đăng nhập */
@@ -3043,9 +3110,6 @@ try{
     window.showPage = function(){ return safeCall(__p, ...arguments); };
   }
 }catch(e){ if(window.__gauPanic) __gauPanic(e); }</script>
-
-
-
 <script>
 
 /* ===============================
@@ -3156,9 +3220,7 @@ try{
 })();
 
 </script>
-
 <!-- Removed legacy leaderboard script to prevent duplicate definitions -->
-
 <script>
 
 /* === v2.5.3: helper to spawn green ✓ tick at click position === */
@@ -3192,7 +3254,6 @@ try{
 })();
 
 </script>
-
 <script>
 
 /* v2.5.3c: persistent tick setter */
@@ -3225,7 +3286,6 @@ try{
 })();
 
 </script>
-
 <script>
 
 /* === v2.5.4: override renderMatching with animated connector lines === */
@@ -3380,14 +3440,13 @@ try{
 
 </script>
 <!-- v2.5.7-stable: runtime error overlay -->
-<div id="app-error" class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
-  <div class="bg-white rounded-2xl p-6 w-96 text-center">
-    <div class="text-2xl font-bold text-red-600 mb-2">Đã xảy ra lỗi</div>
-    <div class="msg text-gray-700 break-words text-sm">Đã có lỗi trong quá trình chạy. Bạn hãy bấm "Tải lại trang".</div>
-    <button class="mt-4 px-4 py-2 rounded-xl bg-blue-600 text-white" onclick="location.reload()">Tải lại trang</button>
-  </div>
+<div class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/50" id="app-error">
+<div class="bg-white rounded-2xl p-6 w-96 text-center">
+<div class="text-2xl font-bold text-red-600 mb-2">Đã xảy ra lỗi</div>
+<div class="msg text-gray-700 break-words text-sm">Đã có lỗi trong quá trình chạy. Bạn hãy bấm "Tải lại trang".</div>
+<button class="mt-4 px-4 py-2 rounded-xl bg-blue-600 text-white" onclick="location.reload()">Tải lại trang</button>
 </div>
-
+</div>
 <script>
 window.MINIGAME_CFG = {
   "version": "1.0",
@@ -4110,46 +4169,42 @@ window.MINIGAME_CFG = {
   window.showPage = function(id){ _showPage && _showPage(id); if (id==='page-game') renderGameList(); };
 })();
 </script>
-
-  <!-- ===== Chatbot toggle & panel (added by ChatGPT) ===== -->
-  <button id="gau-chat-toggle" class="kids-font rounded-full shadow-xl p-0 border-0" title="Chat với Gấu Con">
-    <img alt="Gấu Chat" src="data/images/logo.jpg" style="width:64px;height:64px;border-radius:50%;border:3px solid white;box-shadow:0 8px 24px rgba(2,6,23,.18)">
-  </button>
-
-  <section id="gau-chat-panel" class="kids-font">
-    <div id="gau-chat-header">
-      <div id="gau-chat-title">
-        <span style="font-size:22px">🐻</span>
-        <div>
-          <div>Gấu Con Chatbot</div>
-          <div class="gau-tip">Trả lời kiến thức Tin học lớp 3–5 (có SGK/RAG)</div>
-        </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <label class="gau-tip">Lớp:</label>
-        <select id="gau-grade" class="gau-select">
-          <option value="auto">Tự nhận diện</option>
-          <option value="current">Theo lớp đang chọn</option>
-          <option value="3">Lớp 3</option>
-          <option value="4">Lớp 4</option>
-          <option value="5">Lớp 5</option>
-        </select>
-        <button id="gau-chat-close" aria-label="Đóng">✖</button>
-      </div>
-    </div>
-    <div id="gau-chat-stream"></div>
-    <div id="gau-chat-inputbar">
-      <input id="gau-input" placeholder="Gõ câu hỏi, ví dụ: “Trong Word, nút B dùng để làm gì?”" />
-      <button id="gau-send">GỬI</button>
-    </div>
-  </section>
-
-
+<!-- ===== Chatbot toggle & panel (added by ChatGPT) ===== -->
+<button class="kids-font rounded-full shadow-xl p-0 border-0" id="gau-chat-toggle" title="Chat với Gấu Con">
+<img alt="Gấu Chat" src="data/images/logo.jpg" style="width:64px;height:64px;border-radius:50%;border:3px solid white;box-shadow:0 8px 24px rgba(2,6,23,.18)"/>
+</button>
+<section class="kids-font" id="gau-chat-panel">
+<div id="gau-chat-header">
+<div id="gau-chat-title">
+<span style="font-size:22px">🐻</span>
+<div>
+<div>Gấu Con Chatbot</div>
+<div class="gau-tip">Trả lời kiến thức Tin học lớp 3–5 (có SGK/RAG)</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<label class="gau-tip">Lớp:</label>
+<select class="gau-select" id="gau-grade">
+<option value="auto">Tự nhận diện</option>
+<option value="current">Theo lớp đang chọn</option>
+<option value="3">Lớp 3</option>
+<option value="4">Lớp 4</option>
+<option value="5">Lớp 5</option>
+</select>
+<button aria-label="Đóng" id="gau-chat-close">✖</button>
+</div>
+</div>
+<div id="gau-chat-stream"></div>
+<div id="gau-chat-inputbar">
+<input id="gau-input" placeholder="Gõ câu hỏi, ví dụ: “Trong Word, nút B dùng để làm gì?”"/>
+<button id="gau-send">GỬI</button>
+</div>
+</section>
 <script>
 // ====== Gấu Con Chatbot - Frontend (v2.7) ======
 (function(){
   // Updated to latest Apps Script deployment URL for all features
-  const WEBAPP_URL='https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6OlNmq-Dpv_hHsaYX0qjjTUqlFLYykVZ6gWVDWbJ7-9od0t/exec';
+  const WEBAPP_URL='https://script.google.com/macros/s/AKfycbyNcfoWBHaKcvvZr7L2i3u62_AhZmC53w-wS1PaW3SULV3-iUMP6kKH-4I7AGjOawO1/exec';
 
   const $ = (sel)=>document.querySelector(sel);
   const panel = $('#gau-chat-panel');
@@ -4281,47 +4336,41 @@ window.MINIGAME_CFG = {
   window.__askGau = submitQuestion;
 })();
 </script>
-
-
-  <!-- === Auth Modal (v2.7.3) === -->
-  <div id="auth-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-[70]">
-    <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-xl font-extrabold text-blue-700">Đăng Nhập / Đăng Ký</h3>
-        <button id="auth-close" class="text-2xl leading-none text-gray-500 hover:text-gray-700">×</button>
-      </div>
-      <div id="auth-alert" class="hidden mb-3 text-sm p-3 rounded-md"></div>
-
-      <div class="flex gap-2 mb-4">
-        <button id="tab-login" class="flex-1 py-2 rounded-xl bg-blue-100 font-bold">Đăng nhập</button>
-        <button id="tab-register" class="flex-1 py-2 rounded-xl bg-gray-100">Đăng ký</button>
-      </div>
-
-      <form id="form-login" class="space-y-3">
-        <input name="student_id" autocomplete="username" placeholder="Mã định danh (vd: SA-0001)" class="w-full border rounded-xl p-3" required>
-        <input name="pin" type="password" autocomplete="current-password" placeholder="PIN" class="w-full border rounded-xl p-3" required>
-        <div class="text-xs text-gray-500">Hoặc vào chế độ giáo viên: điền mật khẩu bên dưới.</div>
-        <input name="teacher_pass" type="password" placeholder="Mật khẩu giáo viên (tuỳ chọn - 122025)" class="w-full border rounded-xl p-3">
-        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-3 font-bold" type="submit">Đăng nhập</button>
-      </form>
-
-      <form id="form-register" class="space-y-3 hidden">
-        <input name="name" placeholder="Tên học sinh" class="w-full border rounded-xl p-3" required>
-        <div class="grid grid-cols-2 gap-3">
-          <input name="grade" placeholder="Khối (3/4/5)" class="border rounded-xl p-3" required>
-          <input name="class" placeholder="Lớp (vd: 5A)" class="border rounded-xl p-3" required>
-        </div>
-        <input name="student_id" placeholder="Mã định danh (tự đặt, không trùng)" class="w-full border rounded-xl p-3" required>
-        <input name="pin" type="password" placeholder="Tạo PIN (≥4 ký tự)" class="w-full border rounded-xl p-3" required>
-        <button class="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl p-3 font-bold" type="submit">Tạo tài khoản</button>
-      </form>
-    </div>
-  </div>
-
+<!-- === Auth Modal (v2.7.3) === -->
+<div class="fixed inset-0 bg-black/40 hidden items-center justify-center z-[70]" id="auth-modal">
+<div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-xl font-extrabold text-blue-700">Đăng Nhập / Đăng Ký</h3>
+<button class="text-2xl leading-none text-gray-500 hover:text-gray-700" id="auth-close">×</button>
+</div>
+<div class="hidden mb-3 text-sm p-3 rounded-md" id="auth-alert"></div>
+<div class="flex gap-2 mb-4">
+<button class="flex-1 py-2 rounded-xl bg-blue-100 font-bold" id="tab-login">Đăng nhập</button>
+<button class="flex-1 py-2 rounded-xl bg-gray-100" id="tab-register">Đăng ký</button>
+</div>
+<form class="space-y-3" id="form-login">
+<input autocomplete="username" class="w-full border rounded-xl p-3" name="student_id" placeholder="Mã định danh (vd: SA-0001)" required=""/>
+<input autocomplete="current-password" class="w-full border rounded-xl p-3" name="pin" placeholder="PIN" required="" type="password"/>
+<div class="text-xs text-gray-500">Hoặc vào chế độ giáo viên: điền mật khẩu bên dưới.</div>
+<input class="w-full border rounded-xl p-3" name="teacher_pass" placeholder="Mật khẩu giáo viên (tuỳ chọn - 122025)" type="password"/>
+<button class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-3 font-bold" type="submit">Đăng nhập</button>
+</form>
+<form class="space-y-3 hidden" id="form-register">
+<input class="w-full border rounded-xl p-3" name="name" placeholder="Tên học sinh" required=""/>
+<div class="grid grid-cols-2 gap-3">
+<input class="border rounded-xl p-3" name="grade" placeholder="Khối (3/4/5)" required=""/>
+<input class="border rounded-xl p-3" name="class" placeholder="Lớp (vd: 5A)" required=""/>
+</div>
+<input class="w-full border rounded-xl p-3" name="student_id" placeholder="Mã định danh (tự đặt, không trùng)" required=""/>
+<input class="w-full border rounded-xl p-3" name="pin" placeholder="Tạo PIN (≥4 ký tự)" required="" type="password"/>
+<button class="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl p-3 font-bold" type="submit">Tạo tài khoản</button>
+</form>
+</div>
+</div>
 <script>
 (function(){
 // Updated API URL to the latest GAS deployment
-const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6OlNmq-Dpv_hHsaYX0qjjTUqlFLYykVZ6gWVDWbJ7-9od0t/exec";
+const AUTH_API = "https://script.google.com/macros/s/AKfycbyNcfoWBHaKcvvZr7L2i3u62_AhZmC53w-wS1PaW3SULV3-iUMP6kKH-4I7AGjOawO1/exec";
   const $ = (sel) => document.querySelector(sel);
   const modal = $("#auth-modal");
   const btnOpen = $("#auth-open-btn");
@@ -4429,8 +4478,6 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
   });
 })();
 </script>
-
-
 <script>
 (function(){
   const AUTH_KEY = "gau_auth";
@@ -4492,162 +4539,151 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
   window.addEventListener("load", renderAuthUI);
 })();
 </script>
-
 <!-- Account Settings Modal -->
-<div id="account-modal" class="fixed inset-0 z-[100] hidden">
-  <div class="absolute inset-0 bg-black/40"></div>
-  <div class="absolute inset-0 flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden">
-      <div class="px-5 py-4 border-b flex items-center justify-between">
-        <h3 class="font-bold text-gray-800">Cài đặt tài khoản</h3>
-        <button id="acc-close" class="text-gray-500 hover:text-gray-700 text-xl leading-none">&times;</button>
-      </div>
-      <div class="p-5 space-y-4">
-        <div class="flex items-center gap-3">
-          <img id="acc-modal-avatar" src="data/images/logo-bear-64.png" class="w-10 h-10 rounded-full ring-2 ring-blue-100" alt="avatar">
-          <div>
-            <div id="acc-modal-name" class="font-semibold">Học sinh</div>
-            <div id="acc-modal-meta" class="text-sm text-gray-600">Khối • Lớp</div>
-          </div>
-        </div>
-        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
-          <b>Lưu ý:</b> Thay đổi thông tin và đổi PIN sẽ được bật ở giai đoạn P2 (backend). Hiện tại bạn có thể Đăng xuất bình thường.
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <button id="acc-change-pin" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-600 cursor-not-allowed">Đổi PIN (sắp bật)</button>
-          <button id="acc-change-info" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-600 cursor-not-allowed">Đổi thông tin (sắp bật)</button>
-        </div>
-      </div>
-      <div class="px-5 py-4 border-t flex justify-end gap-2">
-        <button id="acc-modal-logout" class="px-4 py-2 rounded-lg bg-red-500 text-white">Đăng xuất</button>
-        <button id="acc-close2" class="px-4 py-2 rounded-lg bg-gray-200">Đóng</button>
-      </div>
-    </div>
-  </div>
+<div class="fixed inset-0 z-[100] hidden" id="account-modal">
+<div class="absolute inset-0 bg-black/40"></div>
+<div class="absolute inset-0 flex items-center justify-center p-4">
+<div class="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden">
+<div class="px-5 py-4 border-b flex items-center justify-between">
+<h3 class="font-bold text-gray-800">Cài đặt tài khoản</h3>
+<button class="text-gray-500 hover:text-gray-700 text-xl leading-none" id="acc-close">×</button>
 </div>
-
+<div class="p-5 space-y-4">
+<div class="flex items-center gap-3">
+<img alt="avatar" class="w-10 h-10 rounded-full ring-2 ring-blue-100" id="acc-modal-avatar" src="data/images/logo-bear-64.png"/>
+<div>
+<div class="font-semibold" id="acc-modal-name">Học sinh</div>
+<div class="text-sm text-gray-600" id="acc-modal-meta">Khối • Lớp</div>
+</div>
+</div>
+<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
+<b>Lưu ý:</b> Thay đổi thông tin và đổi PIN sẽ được bật ở giai đoạn P2 (backend). Hiện tại bạn có thể Đăng xuất bình thường.
+        </div>
+<div class="grid grid-cols-2 gap-3">
+<button class="px-4 py-2 rounded-lg bg-gray-200 text-gray-600 cursor-not-allowed" id="acc-change-pin">Đổi PIN (sắp bật)</button>
+<button class="px-4 py-2 rounded-lg bg-gray-200 text-gray-600 cursor-not-allowed" id="acc-change-info">Đổi thông tin (sắp bật)</button>
+</div>
+</div>
+<div class="px-5 py-4 border-t flex justify-end gap-2">
+<button class="px-4 py-2 rounded-lg bg-red-500 text-white" id="acc-modal-logout">Đăng xuất</button>
+<button class="px-4 py-2 rounded-lg bg-gray-200" id="acc-close2">Đóng</button>
+</div>
+</div>
+</div>
+</div>
 <!-- === [AUTH UPGRADE v2.8.0] Account Settings Modal (inserted just before </body>) === -->
-<div id="account-modal" class="fixed inset-0 hidden items-center justify-center z-50">
-  <div class="absolute inset-0 bg-black/40"></div>
-  <div class="relative bg-white rounded-3xl shadow-2xl w-[min(92vw,560px)] p-6">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-xl font-extrabold text-blue-700">Cài đặt tài khoản</h3>
-      <button id="account-close" class="text-2xl leading-none">×</button>
-    </div>
-
-    <div class="flex items-center gap-3 mb-4">
-      <img id="modal-avatar" class="w-12 h-12 rounded-full ring-2 ring-blue-100" src="data/images/logo-bear-64.png" alt="">
-      <div>
-        <div id="modal-name" class="font-bold">Học sinh</div>
-        <div id="modal-grade-class" class="text-sm text-gray-600">Khối • Lớp</div>
-      </div>
-    </div>
-
-    <div class="space-y-3">
-      <!-- PIN change button remains -->
-      <button id="btnChangePin" class="w-full px-4 py-2 rounded-xl bg-white border">Đổi PIN</button>
-
-      <!-- Personal information form -->
-      <div class="border-t pt-3 space-y-2">
-        <label class="text-sm text-gray-600">Cập nhật thông tin</label>
-        <input type="text" id="inputName" class="w-full border rounded-xl p-3" placeholder="Tên hiển thị">
-        <div class="grid grid-cols-2 gap-3">
-          <input type="text" id="inputGrade" class="border rounded-xl p-3" placeholder="Khối (3/4/5)">
-          <input type="text" id="inputClass" class="border rounded-xl p-3" placeholder="Lớp (vd: 5A)">
-        </div>
-        <button id="btnSaveInfo" class="w-full px-3 py-2 rounded-xl bg-blue-600 text-white">Lưu thông tin</button>
-      </div>
-
-      <!-- Avatar selection section -->
-      <div class="border-t pt-3" id="avatar-select-section">
-        <label class="text-sm text-gray-600">Chọn ảnh đại diện</label>
-        <!-- Grid of built‑in avatars; populated by JS -->
-        <div id="avatar-icon-grid" class="grid grid-cols-4 gap-3 mt-2"></div>
-        <div class="mt-3">
-          <button id="btnSaveAvatar" class="px-3 py-2 rounded-xl bg-blue-600 text-white">Lưu ảnh đại diện</button>
-        </div>
-        <!-- Preview for the currently selected avatar -->
-        <img id="avatarPreview" class="mt-3 w-16 h-16 rounded-full ring-2 ring-blue-100" src="data/images/logo-bear-64.png" alt="">
-      </div>
-    </div>
-
-    <div class="mt-5 flex justify-end">
-      <button id="account-close-2" class="px-4 py-2 rounded-xl bg-gray-100">Đóng</button>
-    </div>
-  </div>
+<div class="fixed inset-0 hidden items-center justify-center z-50" id="account-modal">
+<div class="absolute inset-0 bg-black/40"></div>
+<div class="relative bg-white rounded-3xl shadow-2xl w-[min(92vw,560px)] p-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xl font-extrabold text-blue-700">Cài đặt tài khoản</h3>
+<button class="text-2xl leading-none" id="account-close">×</button>
 </div>
-
-
+<div class="flex items-center gap-3 mb-4">
+<img alt="" class="w-12 h-12 rounded-full ring-2 ring-blue-100" id="modal-avatar" src="data/images/logo-bear-64.png"/>
+<div>
+<div class="font-bold" id="modal-name">Học sinh</div>
+<div class="text-sm text-gray-600" id="modal-grade-class">Khối • Lớp</div>
+</div>
+</div>
+<div class="space-y-3">
+<!-- PIN change button remains -->
+<button class="w-full px-4 py-2 rounded-xl bg-white border" id="btnChangePin">Đổi PIN</button>
+<!-- Personal information form -->
+<div class="border-t pt-3 space-y-2">
+<label class="text-sm text-gray-600">Cập nhật thông tin</label>
+<input class="w-full border rounded-xl p-3" id="inputName" placeholder="Tên hiển thị" type="text"/>
+<div class="grid grid-cols-2 gap-3">
+<input class="border rounded-xl p-3" id="inputGrade" placeholder="Khối (3/4/5)" type="text"/>
+<input class="border rounded-xl p-3" id="inputClass" placeholder="Lớp (vd: 5A)" type="text"/>
+</div>
+<button class="w-full px-3 py-2 rounded-xl bg-blue-600 text-white" id="btnSaveInfo">Lưu thông tin</button>
+</div>
+<!-- Avatar selection section -->
+<div class="border-t pt-3" id="avatar-select-section">
+<label class="text-sm text-gray-600">Chọn ảnh đại diện</label>
+<!-- Grid of built‑in avatars; populated by JS -->
+<div class="grid grid-cols-4 gap-3 mt-2" id="avatar-icon-grid"></div>
+<div class="mt-3">
+<button class="px-3 py-2 rounded-xl bg-blue-600 text-white" id="btnSaveAvatar">Lưu ảnh đại diện</button>
+</div>
+<!-- Preview for the currently selected avatar -->
+<img alt="" class="mt-3 w-16 h-16 rounded-full ring-2 ring-blue-100" id="avatarPreview" src="data/images/logo-bear-64.png"/>
+</div>
+</div>
+<div class="mt-5 flex justify-end">
+<button class="px-4 py-2 rounded-xl bg-gray-100" id="account-close-2">Đóng</button>
+</div>
+</div>
+</div>
 <!-- === [AUTH UPGRADE v2.8.0] Auth wiring appended before </body> (no existing IDs changed) === -->
 <!-- Toast message for success notifications -->
-<div id="success-toast" class="hidden fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-xl shadow-lg flex items-center gap-2 z-50">
-  <span class="text-xl">✓</span>
-  <span id="success-toast-msg"></span>
+<div class="hidden fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-xl shadow-lg flex items-center gap-2 z-50" id="success-toast">
+<span class="text-xl">✓</span>
+<span id="success-toast-msg"></span>
 </div>
-
 <!-- P2 Leaderboard Modal Overlay (hidden by default) -->
-<div id="p2-lb-overlay" class="hidden fixed inset-0 z-50 items-center justify-center flex">
-  <!-- backdrop -->
-  <div class="absolute inset-0 bg-black/50"></div>
-  <!-- modal -->
-  <div class="relative bg-white rounded-2xl shadow-2xl p-6 max-w-3xl w-[92vw] max-h-[90vh] overflow-y-auto">
-    <div class="flex items-center justify-between mb-4">
-      <div class="flex items-center gap-2">
-        <span class="text-3xl">🏆</span>
-        <h3 class="text-xl font-extrabold text-blue-700">Bảng xếp hạng</h3>
-      </div>
-      <button id="p2-lb-close" class="text-3xl leading-none hover:text-red-500">&times;</button>
-    </div>
-    <!-- My Stats section -->
-    <div id="p2-my-stats" class="mb-5">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-center">
-          <div class="text-sm text-gray-600 mb-1">Điểm hôm nay</div>
-          <div class="relative h-3 bg-yellow-100 rounded-full overflow-hidden">
-            <div id="p2-lb-progress-bar" class="absolute top-0 left-0 h-full bg-yellow-400 rounded-full" style="width:0%"></div>
-          </div>
-          <div id="p2-lb-progress-text" class="text-xs mt-1">0 / 0</div>
-        </div>
-        <div class="p-3 bg-green-50 border border-green-200 rounded-xl text-center">
-          <div class="text-sm text-gray-600 mb-1">Điểm cao nhất</div>
-          <div id="p2-lb-best-score" class="text-lg font-bold">—</div>
-          <div id="p2-lb-best-quiz" class="text-xs text-gray-500">—</div>
-        </div>
-        <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl text-center">
-          <div class="text-sm text-gray-600 mb-1">Thời gian tốt nhất</div>
-          <div id="p2-lb-best-time" class="text-lg font-bold">—</div>
-          <div class="text-xs text-gray-500">ms</div>
-        </div>
-      </div>
-    </div>
-    <!-- Tabs for scopes -->
-    <div class="flex mb-3">
-      <button class="p2-lb-tab px-4 py-1 text-sm font-medium rounded-full mr-2 bg-blue-600 text-white" data-scope="daily">Hôm nay</button>
-      <button class="p2-lb-tab px-4 py-1 text-sm font-medium rounded-full mr-2 bg-gray-200 text-gray-700" data-scope="weekly">Tuần này</button>
-      <button class="p2-lb-tab px-4 py-1 text-sm font-medium rounded-full bg-gray-200 text-gray-700" data-scope="all">All-time</button>
-    </div>
-    <!-- Leaderboard table -->
-    <div class="overflow-auto">
-      <table class="min-w-full text-sm">
-        <thead class="sticky top-0 bg-white">
-          <tr class="border-b">
-            <th class="px-2 py-2">Hạng</th>
-            <th class="px-2 py-2">Họ & tên</th>
-            <th class="px-2 py-2">Lớp</th>
-            <th class="px-2 py-2">Điểm</th>
-            <th class="px-2 py-2">Thời gian</th>
-          </tr>
-        </thead>
-        <tbody id="p2-lb-list">
-          <tr><td colspan="5" class="text-center p-3 text-gray-500">Đang tải…</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+<div class="hidden fixed inset-0 z-50 items-center justify-center flex" id="p2-lb-overlay">
+<!-- backdrop -->
+<div class="absolute inset-0 bg-black/50"></div>
+<!-- modal -->
+<div class="relative bg-white rounded-2xl shadow-2xl p-6 max-w-3xl w-[92vw] max-h-[90vh] overflow-y-auto">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="text-3xl">🏆</span>
+<h3 class="text-xl font-extrabold text-blue-700">Bảng xếp hạng</h3>
 </div>
-
-    <!-- scoreboard script: defines functions for leaderboard & my stats and binds events -->
-    <script>
+<button class="text-3xl leading-none hover:text-red-500" id="p2-lb-close">×</button>
+</div>
+<!-- My Stats section -->
+<div class="mb-5" id="p2-my-stats">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+<div class="p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-center">
+<div class="text-sm text-gray-600 mb-1">Điểm hôm nay</div>
+<div class="relative h-3 bg-yellow-100 rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-yellow-400 rounded-full" id="p2-lb-progress-bar" style="width:0%"></div>
+</div>
+<div class="text-xs mt-1" id="p2-lb-progress-text">0 / 0</div>
+</div>
+<div class="p-3 bg-green-50 border border-green-200 rounded-xl text-center">
+<div class="text-sm text-gray-600 mb-1">Điểm cao nhất</div>
+<div class="text-lg font-bold" id="p2-lb-best-score">—</div>
+<div class="text-xs text-gray-500" id="p2-lb-best-quiz">—</div>
+</div>
+<div class="p-3 bg-blue-50 border border-blue-200 rounded-xl text-center">
+<div class="text-sm text-gray-600 mb-1">Thời gian tốt nhất</div>
+<div class="text-lg font-bold" id="p2-lb-best-time">—</div>
+<div class="text-xs text-gray-500">ms</div>
+</div>
+</div>
+</div>
+<!-- Tabs for scopes -->
+<div class="flex mb-3">
+<button class="p2-lb-tab px-4 py-1 text-sm font-medium rounded-full mr-2 bg-blue-600 text-white" data-scope="daily">Hôm nay</button>
+<button class="p2-lb-tab px-4 py-1 text-sm font-medium rounded-full mr-2 bg-gray-200 text-gray-700" data-scope="weekly">Tuần này</button>
+<button class="p2-lb-tab px-4 py-1 text-sm font-medium rounded-full bg-gray-200 text-gray-700" data-scope="all">All-time</button>
+</div>
+<!-- Leaderboard table -->
+<div class="overflow-auto">
+<table class="min-w-full text-sm">
+<thead class="sticky top-0 bg-white">
+<tr class="border-b">
+<th class="px-2 py-2">Hạng</th>
+<th class="px-2 py-2">Họ &amp; tên</th>
+<th class="px-2 py-2">Lớp</th>
+<th class="px-2 py-2">Điểm</th>
+<th class="px-2 py-2">Thời gian</th>
+</tr>
+</thead>
+<tbody id="p2-lb-list">
+<tr><td class="text-center p-3 text-gray-500" colspan="5">Đang tải…</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- scoreboard script: defines functions for leaderboard & my stats and binds events -->
+<script>
       // scoreboard module executed after DOM is ready
       document.addEventListener('DOMContentLoaded', () => {
         const lbOverlay = document.getElementById('p2-lb-overlay');
@@ -4684,17 +4720,17 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
             const daily = await apiPost('leaderboard', { token, scope:'daily', limit:50 });
             const rows = daily.rows || daily.data || daily.items || [];
             const mine = rows.find(r => r.student_id === me.student_id);
-            if(mine) today = Number(mine.points || mine.score || mine.best_score_final || 0);
+            // new scoring API only returns `points` for each row
+            if(mine) today = Number(mine.points || 0);
           }catch(e){}
-          // fetch all-time leaderboard to get best-of
+          // fetch all-time leaderboard to get best points from all-time leaderboard
           try{
             const all = await apiPost('leaderboard', { token, scope:'all', limit:50 });
             const rows = all.rows || all.data || all.items || [];
             const mine = rows.find(r => r.student_id === me.student_id);
             if(mine){
-              bestScore = mine.best_score_final || mine.score || mine.points || '—';
-              bestTime  = mine.best_duration_ms || mine.duration_ms || '—';
-              bestQuiz  = mine.quiz_id || mine.best_quiz_id || '—';
+              bestScore = (typeof mine.points !== 'undefined') ? mine.points : '—';
+              // bestTime and bestQuiz are not provided by the new API; leave as '—'
             }
           }catch(e){}
           // progress bar
@@ -4781,7 +4817,6 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
         });
       });
     </script>
-
 <!-- Scoped styles for the leaderboard & stats modal -->
 <style id="p2-lb-styles">
   /* Tab states */
@@ -4818,7 +4853,7 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
     width: 1.6rem;
   }
 </style>
-  <!-- Override and rebind leaderboard JS to avoid init errors -->
+<!-- Override and rebind leaderboard JS to avoid init errors -->
 <script>
     // Custom leaderboard handler: run after full page load to ensure apiPost & helpers are defined
     window.addEventListener('load', function(){
@@ -4950,7 +4985,10 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
 <script>
 // 2) Constants & helpers
 // Updated API URL to the latest GAS deployment
-const AUTH_API = 'https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6OlNmq-Dpv_hHsaYX0qjjTUqlFLYykVZ6gWVDWbJ7-9od0t/exec';  // ← GAS /exec URL
+const AUTH_API = 'https://script.google.com/macros/s/AKfycbyNcfoWBHaKcvvZr7L2i3u62_AhZmC53w-wS1PaW3SULV3-iUMP6kKH-4I7AGjOawO1/exec';  // ← GAS /exec URL
+
+// v2.8.6: new Scoring API for start_run/submit_run/leaderboard calls
+const SCORING_API = 'https://script.google.com/macros/s/AKfycbyNcfoWBHaKcvvZr7L2i3u62_AhZmC53w-wS1PaW3SULV3-iUMP6kKH-4I7AGjOawO1/exec';
 const AUTH_KEY = "gau_auth";
 
 function getAuth(){ try { return JSON.parse(localStorage.getItem(AUTH_KEY) || "{}"); } catch(e){ return {}; } }
@@ -4958,10 +4996,14 @@ function setAuth(x){ localStorage.setItem(AUTH_KEY, JSON.stringify(x || {})); }
 function clearAuth(){ localStorage.removeItem(AUTH_KEY); }
 
 async function apiPost(action, payload){
+  // Choose endpoint based on action: scoring-related actions go to SCORING_API
+  // All other actions (login, whoami, etc.) continue to use AUTH_API.  
+  const scoringActions = ['start_run','submit_run','leaderboard'];
+  const apiBase = (scoringActions.indexOf(action) !== -1) ? SCORING_API : AUTH_API;
   // Use a plain text content type to avoid CORS preflight issues when
   // sending JSON from a file:// origin. Apps Script accepts JSON
   // encoded bodies even with this header.
-  const res = await fetch(AUTH_API, {
+  const res = await fetch(apiBase, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
     body: JSON.stringify(Object.assign({ action }, payload || {})),
@@ -5542,5 +5584,93 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<script>
+(function () {
+  if (!('attachShadow' in Element.prototype)) return;
+  const _attachShadow = Element.prototype.attachShadow;
+  Element.prototype.attachShadow = function(init) {
+    try { return _attachShadow.call(this, init); }
+    catch (e) {
+      console.warn('attachShadow failed; fallback to light DOM for:', this, e);
+      if (!this.shadowRoot) {
+        try { Object.defineProperty(this, 'shadowRoot', { value: this, configurable: true }); } catch(_){}
+      }
+      return this;
+    }
+  };
+})();
+
+(function () {
+  const SELECTORS = [
+    '.answer', '.option', '.choice', '.answer-option', '.dap-an', '.lua-chon',
+    '.btn-answer', 'button[data-answer]', 'li[data-answer]', 'div[data-answer]'
+  ].join(',');
+
+  function rememberText(el) {
+    if (!el) return;
+    const t = (el.textContent || '').trim();
+    if (!el.dataset) return;
+    if (!el.dataset.original) el.dataset.original = t;
+  }
+
+  function restoreIfLost(el) {
+    if (!el) return;
+    const txt = (el.textContent || '').trim();
+    if (!txt && el.dataset && el.dataset.original) {
+      el.textContent = el.dataset.original;
+    }
+  }
+
+  function markSelected(el) {
+    if (!el) return;
+    el.classList.add('selected-answer');
+    restoreIfLost(el);
+  }
+
+  function initOnce(root) {
+    root.querySelectorAll(SELECTORS).forEach(rememberText);
+    root.addEventListener('click', function (ev) {
+      const el = ev.target.closest(SELECTORS);
+      if (!el) return;
+      setTimeout(function () { markSelected(el); }, 0);
+    }, true);
+
+    const mo = new MutationObserver((muts) => {
+      muts.forEach(m => {
+        if (m.type === 'childList') {
+          m.addedNodes.forEach(node => {
+            if (node.nodeType === 1) {
+              if (node.matches && node.matches(SELECTORS)) rememberText(node);
+              node.querySelectorAll && node.querySelectorAll(SELECTORS).forEach(rememberText);
+            }
+          });
+        } else if (m.type === 'characterData') {
+          const el = m.target && m.target.parentElement;
+          if (el && el.matches && el.matches(SELECTORS)) restoreIfLost(el);
+        }
+      });
+    });
+    mo.observe(root, { subtree: true, childList: true, characterData: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => initOnce(document));
+  } else {
+    initOnce(document);
+  }
+})();
+</script>
+<style>
+.selected-answer {
+  background: #16a34a !important;
+  color: #fff !important;
+  border-color: #16a34a !important;
+}
+.selected-answer, .selected-answer * {
+  text-decoration: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+</style>
 </body>
 </html>
