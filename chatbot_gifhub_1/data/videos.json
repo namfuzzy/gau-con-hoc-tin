@@ -1,0 +1,62 @@
+{
+  "Lớp 3": [
+    {
+      "type": "file",
+      "src": "data/lop3/b01.mp4",
+      "title": "Bài 1: Thông tin và quyết định",
+      "desc": "Chủ đề 1: Máy tính và em",
+      "poster": "data/posters/b01.jpg"
+    },
+    {
+      "type": "file",
+      "src": "data/lop3/b02.mp4",
+      "title": "Bài 2: Xử lí thông tin",
+      "desc": "Chủ đề 1: Máy tính và em",
+      "poster": "data/posters/b02.jpg"
+    },
+    {
+      "type": "file",
+      "src": "data/lop3/b03.mp4",
+      "title": "Bài 3: Máy tính - người bạn của em",
+      "desc": "Chủ đề 1: Máy tính và em",
+      "poster": "data/posters/b03.jpg"
+    },
+    {
+      "type": "file",
+      "src": "data/lop3/b04.mp4",
+      "title": "Bài 4: Bàn phím máy tính",
+      "desc": "Chủ đề 1: Máy tính và em",
+      "poster": "data/posters/b04.jpg"
+    },
+    {
+      "type": "file",
+      "src": "data/lop3/b05.mp4",
+      "title": "Bài 5: Luyện tập sử dụng bàn phím",
+      "desc": "Chủ đề 1: Máy tính và em",
+      "poster": "data/posters/b05.jpg"
+    },
+    {
+      "type": "file",
+      "src": "data/lop3/b06.mp4",
+      "title": "Bài 6: Khám phá thông tin trên Internet",
+      "desc": "Chủ đề 2: Mạng máy tính",
+      "poster": "data/posters/b06.jpg"
+    },
+    {
+      "type": "file",
+      "src": "data/lop3/b07.mp4",
+      "title": "Bài 7: Luyện tập tìm kiếm thông tin",
+      "desc": "Chủ đề 2: Mạng máy tính",
+      "poster": "data/posters/b07.jpg"
+    },
+    {
+      "type": "file",
+      "src": "data/lop3/b08.mp4",
+      "title": "Bài 8: (cập nhật tiêu đề tuỳ video)",
+      "desc": "Lớp 3",
+      "poster": "data/posters/b08.jpg"
+    }
+  ],
+  "Lớp 4": [],
+  "Lớp 5": []
+}
