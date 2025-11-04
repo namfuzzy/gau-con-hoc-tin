@@ -219,7 +219,25 @@
       .gau-tip { font-size: 12px; color: #475569; }
       .gau-select { border: 1px solid #cbd5e1; background: white; border-radius: 10px; padding: 6px 8px; }
       .typing { opacity: .8; }
-    </style>
+    
+
+/* === Chatbot FAB (new) === */
+#gau-chat-toggle{ position:fixed; right:18px; bottom:18px; z-index:60; border:none; background:transparent; padding:0; }
+.gau-fab{ display:flex; align-items:center; gap:10px; padding:8px 12px 8px 8px; background:#0ea5e9; color:#fff; border-radius:999px; box-shadow:0 10px 24px rgba(2,6,23,.18); }
+.gau-fab-icon{ width:48px; height:48px; border-radius:50%; background:#0284c7; display:grid; place-items:center; overflow:hidden; }
+.gau-fab-icon svg{ width:30px; height:30px; }
+.gau-fab-text{ font-weight:800; font-size:14px; padding-right:2px; white-space:nowrap; }
+/* rung lắc nhẹ định kỳ để dễ chú ý */
+@keyframes gau-wiggle{ 0%,100%{ transform:rotate(0) } 15%{ transform:rotate(-8deg) } 30%{ transform:rotate(5deg) } 45%{ transform:rotate(-4deg) } 60%{ transform:rotate(2deg) } }
+#gau-chat-toggle .gau-fab{ animation: gau-wiggle 1.3s ease-in-out 3s 2; } /* lắc 2 lần sau 3s */
+#gau-chat-toggle:focus-visible .gau-fab{ outline:3px solid #38bdf8; outline-offset:2px }
+/* thu gọn trên màn nhỏ nếu chật */
+@media (max-width:520px){
+  .gau-fab-text{ display:none }
+  .gau-fab{ padding:8px }
+}
+
+</style>
 <style>
 /* Auto-injected: brighten & saturate the bear image */
 .bear-image-bright {
@@ -960,8 +978,720 @@ const quizData = {
           correctMatches:{'💻 Em tắt máy tính sau khi học':'a. Giữ vệ sinh và tiết kiệm điện','🧍‍♀️ Em ngồi thẳng lưng, mắt cách màn hình 50cm':'b. Ngồi học đúng tư thế','🙅‍♂️ Em không chạm vào dây điện':'c. Giữ an toàn khi dùng máy tính'} 
         }
       ]
-    }
-  },
+    },
+
+"Bài 4": {
+  title: "Bài 4: Làm việc với máy tính",
+  questions: [
+    { level:1, type:'multiple-choice', question:'Câu 1: Máy tính gồm những bộ phận chính nào sau đây?', options:[
+      {text:'A. Màn hình, bàn phím, chuột', correct:false},
+      {text:'B. Màn hình, CPU, bàn phím, chuột', correct:true},
+      {text:'C. CPU, máy in, USB', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 2: Bộ phận nào giúp em nhập dữ liệu vào máy tính?', options:[
+      {text:'A. Chuột và bàn phím', correct:true},
+      {text:'B. Màn hình', correct:false},
+      {text:'C. Loa', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 3: Bộ phận nào giúp em nhìn thấy hình ảnh, chữ viết trên máy tính?', options:[
+      {text:'A. Chuột', correct:false},
+      {text:'B. Màn hình', correct:true},
+      {text:'C. Bàn phím', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 4: Nút nguồn thường được đặt ở đâu?', options:[
+      {text:'A. Trên CPU', correct:true},
+      {text:'B. Trên bàn phím', correct:false},
+      {text:'C. Trên chuột', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 5: Khi tắt máy tính, em cần làm gì?', options:[
+      {text:'A. Rút dây điện ra ngay', correct:false},
+      {text:'B. Nhấn tắt bằng phần mềm hoặc nút nguồn đúng cách', correct:true},
+      {text:'C. Đập mạnh vào CPU', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 6: Hình dưới đây thể hiện hoạt động nào đúng khi sử dụng máy tính?', options:[
+      {text:'A. Tư thế ngồi sai', correct:false},
+      {text:'B. Tư thế ngồi đúng', correct:true},
+      {text:'C. Cả hai đều sai', correct:false}
+    ]},
+    { level:2, type:'fill-in-blank', question:'Câu 7: Tại sao chúng ta cần tắt máy đúng cách?', answer:'Để bảo vệ dữ liệu và tránh hỏng máy' },
+    { level:2, type:'fill-in-blank', question:'Câu 8: Em nên làm gì khi màn hình máy tính không sáng?', answer:'Kiểm tra dây nguồn hoặc báo người lớn' },
+    { level:2, type:'multiple-choice', question:'Câu 9: Em nên giữ khoảng cách bao nhiêu giữa mắt và màn hình máy tính?', options:[
+      {text:'A. 10–15 cm', correct:false},
+      {text:'B. 30–50 cm', correct:true},
+      {text:'C. 1 mét', correct:false}
+    ]},
+    { level:2, type:'true-false', question:'Câu 10a: Em có thể vừa ăn vừa làm việc trên máy tính.', answer:false },
+    { level:2, type:'true-false', question:'Câu 10b: Cần rửa tay sạch trước khi sử dụng máy tính.', answer:true },
+    { level:2, type:'matching', question:'Câu 11: Nối thông tin cho phù hợp', left:[
+      '1. Chuột','2. Màn hình','3. CPU'
+    ], right:[
+      'a. Hiển thị hình ảnh','b. Xử lí thông tin','c. Điều khiển con trỏ và chọn lệnh'
+    ], pairs:[
+      ['1. Chuột','c. Điều khiển con trỏ và chọn lệnh'],
+      ['2. Màn hình','a. Hiển thị hình ảnh'],
+      ['3. CPU','b. Xử lí thông tin']
+    ]},
+    { level:2, type:'fill-in-blank-choice', question:'Câu 12: Máy tính chỉ làm việc khi có đầy đủ các …….. và được …….. đúng cách.', choices:['bộ phận','bật nguồn','sạc pin','ổ cắm'], answer:['bộ phận','bật nguồn'] },
+    { level:3, type:'multiple-choice', question:'Câu 13: Nếu đang học mà máy tính bị treo, em nên làm gì?', options:[
+      {text:'A. Đập bàn phím', correct:false},
+      {text:'B. Báo thầy cô hoặc người lớn', correct:true},
+      {text:'C. Tắt máy ngay', correct:false}
+    ]},
+    { level:3, type:'matching', question:'Câu 14: Em hãy nối hành vi đúng khi làm việc với máy tính', left:['a. Ngồi ngay ngắn, khoảng cách hợp lí','b. Vừa ăn vừa sử dụng máy','c. Giữ màn hình sạch, tay khô ráo'], right:['Đúng','Sai'], pairs:[
+      ['a. Ngồi ngay ngắn, khoảng cách hợp lí','Đúng'],
+      ['b. Vừa ăn vừa sử dụng máy','Sai'],
+      ['c. Giữ màn hình sạch, tay khô ráo','Đúng']
+    ]},
+    { level:3, type:'fill-in-blank', question:'Câu 15: Mô tả tư thế đúng khi ngồi làm việc với máy tính', answer:'Ngồi thẳng lưng, hai tay đặt trên bàn, mắt cách màn hình 40–50 cm' }
+  ]
+}
+,
+
+"Bài 5": {
+  title: "Bài 5: Sử dụng bàn phím",
+  questions: [
+    { level:1, type:'multiple-choice', question:'Câu 1: Trên bàn phím có mấy nhóm phím chính?', options:[
+      {text:'A. 2 nhóm', correct:false},
+      {text:'B. 3 nhóm', correct:false},
+      {text:'C. 4 nhóm', correct:true},
+      {text:'D. 5 nhóm', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 2: Nhóm phím chữ nằm ở vị trí nào trên bàn phím?', options:[
+      {text:'A. Ở giữa', correct:true},
+      {text:'B. Ở bên phải', correct:false},
+      {text:'C. Ở bên trái', correct:false},
+      {text:'D. Ở trên cùng', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 3: Phím Enter dùng để làm gì?', options:[
+      {text:'A. Xóa chữ', correct:false},
+      {text:'B. Xuống dòng', correct:true},
+      {text:'C. Cách chữ', correct:false},
+      {text:'D. Di chuyển con trỏ', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 4: Phím Backspace có tác dụng gì?', options:[
+      {text:'A. Xóa chữ bên phải con trỏ', correct:false},
+      {text:'B. Xóa chữ bên trái con trỏ', correct:true},
+      {text:'C. Viết chữ hoa', correct:false},
+      {text:'D. Di chuyển con trỏ', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 5: Phím Caps Lock có tác dụng gì?', options:[
+      {text:'A. Gõ số', correct:false},
+      {text:'B. Gõ chữ thường', correct:false},
+      {text:'C. Gõ chữ hoa', correct:true},
+      {text:'D. Xóa chữ', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 6: Các phím F, J thuộc hàng phím nào?', options:[
+      {text:'A. Hàng phím trên', correct:false},
+      {text:'B. Hàng phím dưới', correct:false},
+      {text:'C. Hàng phím cơ sở', correct:true}
+    ]},
+
+    { level:2, type:'multiple-choice', question:'Câu 7: Khi gõ chữ, nếu nhấn giữ phím Shift rồi bấm phím chữ, chữ sẽ…', options:[
+      {text:'A. Thành chữ thường', correct:false},
+      {text:'B. Thành chữ hoa', correct:true},
+      {text:'C. Không hiện ra', correct:false},
+      {text:'D. Hiện hai lần', correct:false}
+    ]},
+    { level:2, type:'multiple-choice', question:'Câu 8: Muốn xóa một ký tự bên phải con trỏ, em dùng phím nào?', options:[
+      {text:'A. Delete', correct:true},
+      {text:'B. Backspace', correct:false},
+      {text:'C. Tab', correct:false},
+      {text:'D. Esc', correct:false}
+    ]},
+    { level:2, type:'matching', question:'Câu 9: Hãy nối cột A với cột B cho đúng', left:[
+      '1. Spacebar','2. Backspace','3. Enter'
+    ], right:[
+      'a. Xóa ký tự bên trái con trỏ','b. Tạo khoảng cách giữa hai chữ','c. Xuống dòng'
+    ], pairs:[
+      ['1. Spacebar','b. Tạo khoảng cách giữa hai chữ'],
+      ['2. Backspace','a. Xóa ký tự bên trái con trỏ'],
+      ['3. Enter','c. Xuống dòng']
+    ]},
+    { level:2, type:'true-false', question:'Câu 10a: Phím Shift giúp viết chữ hoa khi giữ cùng phím chữ.', answer:true },
+    { level:2, type:'true-false', question:'Câu 10b: Phím Ctrl dùng để xuống dòng.', answer:false },
+    { level:2, type:'fill-in-blank', question:'Câu 11: Khi muốn viết chữ hoa, em có thể nhấn phím … cùng với phím chữ.', answer:'Shift' },
+    { level:2, type:'matching', question:'Câu 12: Em hãy nối các phím với công dụng tương ứng', left:[
+      '1. Tab','2. Delete','3. Caps Lock'
+    ], right:[
+      'a. Xóa chữ bên phải con trỏ','b. Lùi nhanh sang vị trí kế tiếp','c. Gõ toàn bộ chữ hoa'
+    ], pairs:[
+      ['1. Tab','b. Lùi nhanh sang vị trí kế tiếp'],
+      ['2. Delete','a. Xóa chữ bên phải con trỏ'],
+      ['3. Caps Lock','c. Gõ toàn bộ chữ hoa']
+    ]},
+
+    { level:3, type:'fill-in-blank', question:'Câu 13: Nêu một ví dụ cần dùng phím Enter trong khi học Tin học.', answer:'Ví dụ: Khi viết đoạn văn bản, nhấn Enter để xuống dòng mới.' },
+    { level:3, type:'fill-in-blank', question:'Câu 14: Vì sao cần đặt tay đúng tư thế trên bàn phím?', answer:'Để gõ nhanh, chính xác và tránh mỏi tay.' },
+    { level:3, type:'fill-in-blank', question:'Câu 15: Học sinh trong hình có tư thế ngồi đúng chưa? Vì sao?', answer:'Có. Ngồi thẳng lưng, mắt cách màn hình vừa phải, hai tay đặt đúng trên bàn phím.' }
+  ]
+}
+,
+
+"Bài 6": {
+  title: "Bài 6: Khám phá thông tin trên Internet",
+  questions: [
+    { level:1, type:'multiple-choice', question:'Câu 1: Internet là gì?', options:[
+      {text:'A. Một trò chơi điện tử', correct:false},
+      {text:'B. Một mạng kết nối nhiều máy tính trên toàn thế giới', correct:true},
+      {text:'C. Một loại máy tính mới', correct:false},
+      {text:'D. Một phần mềm gõ văn bản', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 2: Khi muốn tìm kiếm thông tin trên Internet, em có thể dùng công cụ nào?', options:[
+      {text:'A. Microsoft Word', correct:false},
+      {text:'B. Google', correct:true},
+      {text:'C. Paint', correct:false},
+      {text:'D. Máy tính bỏ túi', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 3: Để truy cập Internet, máy tính cần có:', options:[
+      {text:'A. Kết nối mạng', correct:true},
+      {text:'B. Loa', correct:false},
+      {text:'C. Máy in', correct:false},
+      {text:'D. Bàn phím', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 4: Trình duyệt web là gì?', options:[
+      {text:'A. Ứng dụng giúp vẽ hình', correct:false},
+      {text:'B. Ứng dụng giúp xem phim', correct:false},
+      {text:'C. Ứng dụng giúp truy cập trang web', correct:true},
+      {text:'D. Ứng dụng chơi game', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 5: Trang web là gì?', options:[
+      {text:'A. Một tờ giấy trắng', correct:false},
+      {text:'B. Một hình ảnh trong máy tính', correct:false},
+      {text:'C. Một trang thông tin hiển thị trên trình duyệt', correct:true},
+      {text:'D. Một phần của máy tính', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 6: Ý nào dưới đây không phải là đặc điểm của thông tin trên Internet?', options:[
+      {text:'A. Đáng tin cậy, luôn chính xác', correct:true},
+      {text:'B. Được cập nhật thường xuyên', correct:false},
+      {text:'C. Đa dạng và phong phú', correct:false},
+      {text:'D. Có thể truy cập mọi nơi khi có kết nối mạng', correct:false}
+    ]},
+
+    { level:2, type:'multiple-choice', question:'Câu 7: Khi muốn xem dự báo thời tiết trên Internet, em cần làm gì đầu tiên?', options:[
+      {text:'A. Mở máy tính và kết nối mạng', correct:true},
+      {text:'B. Gọi điện thoại cho bạn', correct:false},
+      {text:'C. Mở phần mềm Paint', correct:false},
+      {text:'D. Tắt máy tính', correct:false}
+    ]},
+    { level:2, type:'matching', question:'Câu 8: Hãy nối cột A với cột B cho đúng', left:[
+      '1. Trình duyệt web','2. Ô tìm kiếm','3. Trang web'
+    ], right:[
+      'a. Nơi nhập từ khóa tìm kiếm','b. Giúp em truy cập các trang web','c. Hiển thị thông tin em muốn xem'
+    ], pairs:[
+      ['1. Trình duyệt web','b. Giúp em truy cập các trang web'],
+      ['2. Ô tìm kiếm','a. Nơi nhập từ khóa tìm kiếm'],
+      ['3. Trang web','c. Hiển thị thông tin em muốn xem']
+    ]},
+    { level:2, type:'true-false', question:'Câu 9a: Internet chỉ có thể dùng để chơi game.', answer:false },
+    { level:2, type:'true-false', question:'Câu 9b: Em có thể học tập và tìm kiếm kiến thức trên Internet.', answer:true },
+    { level:2, type:'multiple-choice', question:'Câu 10: Khi truy cập Internet, em nên làm gì để an toàn?', options:[
+      {text:'A. Không chia sẻ thông tin cá nhân', correct:true},
+      {text:'B. Gõ mật khẩu lên mọi trang web', correct:false},
+      {text:'C. Nhấp vào mọi đường link lạ', correct:false},
+      {text:'D. Nói chuyện với người lạ trên mạng', correct:false}
+    ]},
+    { level:2, type:'fill-in-blank', question:'Câu 11: Khi muốn tìm kiếm hình ảnh, em nhập từ khóa vào ô ……… rồi nhấn Enter.', answer:'tìm kiếm' },
+    { level:2, type:'matching', question:'Câu 12: Nối nội dung đúng', left:[
+      '1. Tìm thông tin học tập','2. Xem video hướng dẫn','3. Trò chuyện với bạn bè'
+    ], right:[
+      'a. Giúp học tốt hơn','b. Biết thêm nhiều điều hay','c. Kết nối, chia sẻ với nhau'
+    ], pairs:[
+      ['1. Tìm thông tin học tập','a. Giúp học tốt hơn'],
+      ['2. Xem video hướng dẫn','b. Biết thêm nhiều điều hay'],
+      ['3. Trò chuyện với bạn bè','c. Kết nối, chia sẻ với nhau']
+    ]},
+
+    { level:3, type:'fill-in-blank', question:'Câu 13: Em hãy nêu một ví dụ về việc em dùng Internet để học tập.', answer:'Ví dụ: Xem bài giảng trực tuyến hoặc tra nghĩa từ mới.' },
+    { level:3, type:'fill-in-blank', question:'Câu 14: Nếu thấy một trang web có nội dung không phù hợp, em nên làm gì?', answer:'Đóng trang và báo cho người lớn.' },
+    { level:3, type:'fill-in-blank', question:'Câu 15: Em có nhận xét gì về cách sử dụng Internet đúng cách?', answer:'Chỉ tìm thông tin học tập, không chia sẻ thông tin cá nhân, sử dụng an toàn.' }
+  ]
+}
+,
+
+"Bài 7": {
+  title: "Bài 7: Sắp xếp để dễ tìm",
+  questions: [
+    { level:1, type:'multiple-choice', question:'Câu 1: Sắp xếp các tệp tin gọn gàng giúp em làm gì?', options:[
+      {text:'A. Dễ tìm khi cần', correct:true},
+      {text:'B. Làm máy chạy chậm', correct:false},
+      {text:'C. Xóa bớt dữ liệu', correct:false},
+      {text:'D. Tạo ra virus', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 2: Thư mục (Folder) dùng để:', options:[
+      {text:'A. Xóa tệp tin', correct:false},
+      {text:'B. Lưu trữ và sắp xếp tệp tin', correct:true},
+      {text:'C. Mở máy tính', correct:false},
+      {text:'D. Tắt máy tính', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 3: Em hãy sắp xếp các loại rau củ quả sau vào ba nhóm thích hợp?', options:[
+      {text:'A. Củ: khoai tây, su hào, bắp cải và cà rốt', correct:false},
+      {text:'B. Quả: nhãn, nho, mít, dưa hấu', correct:true},
+      {text:'C. Rau: bắp cải, su hào', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 4: Biểu tượng của thư mục thường có hình:', options:[
+      {text:'A. Quyển vở', correct:false},
+      {text:'B. Cái bút', correct:false},
+      {text:'C. Cái cặp tài liệu', correct:true},
+      {text:'D. Cái loa', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 5: Trong máy tính, em nên đặt tên tệp như thế nào cho dễ tìm?', options:[
+      {text:'A. Tên rõ ràng, dễ hiểu', correct:true},
+      {text:'B. Tên quá dài', correct:false},
+      {text:'C. Tên toàn số', correct:false},
+      {text:'D. Không cần đặt tên', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 6: Khi muốn mở thư mục em nên:', options:[
+      {text:'A. Nhấn đúp chuột vào biểu tượng thư mục', correct:true},
+      {text:'B. Nhấn phím Delete', correct:false},
+      {text:'C. Nhấn Enter liên tục', correct:false},
+      {text:'D. Tắt máy', correct:false}
+    ]},
+
+    { level:2, type:'multiple-choice', question:'Câu 7: Vì sao cần sắp xếp tệp tin vào các thư mục khác nhau?', options:[
+      {text:'A. Để trang trí cho máy tính', correct:false},
+      {text:'B. Để dễ tìm và quản lý hơn', correct:true},
+      {text:'C. Để xóa bớt tệp', correct:false},
+      {text:'D. Để giảm dung lượng', correct:false}
+    ]},
+    { level:2, type:'matching', question:'Câu 8: Hãy nối cột A với cột B cho đúng', left:[
+      '1. Học tập','2. Giải trí','3. Ảnh cá nhân'
+    ], right:[
+      'a. Lưu các bài hát yêu thích','b. Lưu bài tập Toán, Tiếng Việt','c. Lưu hình ảnh của em và gia đình'
+    ], pairs:[
+      ['1. Học tập','b. Lưu bài tập Toán, Tiếng Việt'],
+      ['2. Giải trí','a. Lưu các bài hát yêu thích'],
+      ['3. Ảnh cá nhân','c. Lưu hình ảnh của em và gia đình']
+    ]},
+    { level:2, type:'true-false', question:'Câu 9a: Mọi tệp tin đều nằm trong thư mục.', answer:false },
+    { level:2, type:'true-false', question:'Câu 9b: Một thư mục có thể chứa nhiều thư mục con.', answer:true },
+    { level:2, type:'multiple-choice', question:'Câu 10: Khi lưu tệp, nên chọn vị trí lưu như thế nào?', options:[
+      {text:'A. Lưu lẫn lộn khắp nơi', correct:false},
+      {text:'B. Lưu vào thư mục có tên rõ ràng', correct:true},
+      {text:'C. Lưu vào thùng rác', correct:false},
+      {text:'D. Không cần lưu', correct:false}
+    ]},
+    { level:2, type:'fill-in-blank', question:'Câu 11: Khi em lưu các tệp vào các thư mục riêng biệt, em sẽ … các tệp dễ dàng hơn.', answer:'tìm' },
+    { level:2, type:'matching', question:'Câu 12: Nối tên hành động với lợi ích tương ứng', left:[
+      '1. Đặt tên tệp rõ ràng','2. Lưu tệp vào thư mục riêng','3. Xóa tệp không cần thiết'
+    ], right:[
+      'a. Biết nội dung tệp là gì','b. Dễ tìm khi cần','c. Giữ máy gọn gàng'
+    ], pairs:[
+      ['1. Đặt tên tệp rõ ràng','a. Biết nội dung tệp là gì'],
+      ['2. Lưu tệp vào thư mục riêng','b. Dễ tìm khi cần'],
+      ['3. Xóa tệp không cần thiết','c. Giữ máy gọn gàng']
+    ]},
+
+    { level:3, type:'fill-in-blank', question:'Câu 13: Em hãy cho ví dụ về cách em sắp xếp tệp trong máy tính.', answer:'Ví dụ: Tạo thư mục “Bài tập học kỳ I” và sắp xếp bài Word, hình vẽ vào đó.' },
+    { level:3, type:'fill-in-blank', question:'Câu 14: Khi máy tính có quá nhiều tệp rời rạc, em sẽ làm gì để dễ tìm hơn?', answer:'Tạo thư mục theo chủ đề và sắp xếp tệp vào đó.' },
+    { level:3, type:'fill-in-blank', question:'Câu 15: Theo em, màn hình nào dễ tìm hơn? Vì sao?', answer:'Màn hình C dễ tìm hơn vì sắp xếp ngăn nắp, gọn gàng.' }
+  ]
+}
+,
+
+"Bài 8": {
+  title: "Bài 8: Sơ đồ hình cây – Tổ chức thông tin",
+  questions: [
+    { level:1, type:'multiple-choice', question:'Câu 1: Sơ đồ hình cây dùng để thể hiện điều gì?', options:[
+      {text:'A. Cách các tệp tin và thư mục được sắp xếp trong máy tính', correct:true},
+      {text:'B. Cách trồng cây ngoài vườn', correct:false},
+      {text:'C. Cách gõ văn bản', correct:false},
+      {text:'D. Cách học bài', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 2: Trong sơ đồ hình cây, thư mục gốc thường nằm ở vị trí nào?', options:[
+      {text:'A. Ở trên cùng', correct:true},
+      {text:'B. Ở giữa', correct:false},
+      {text:'C. Ở dưới', correct:false},
+      {text:'D. Ở bên trái', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 3: Thư mục con là gì?', options:[
+      {text:'A. Thư mục nhỏ nằm trong một thư mục khác', correct:true},
+      {text:'B. Thư mục để xóa tệp', correct:false},
+      {text:'C. Thư mục đặc biệt chứa trò chơi', correct:false},
+      {text:'D. Thư mục ngoài màn hình', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 4: Trong sơ đồ hình cây, mỗi nhánh nối thể hiện:', options:[
+      {text:'A. Mối liên hệ giữa thư mục cha và thư mục con', correct:true},
+      {text:'B. Cách di chuyển chuột', correct:false},
+      {text:'C. Số lượng tệp tin', correct:false},
+      {text:'D. Thứ tự bật máy tính', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 5: Trong sơ đồ hình cây, thư mục cha là:', options:[
+      {text:'A. Thư mục chứa thư mục con', correct:true},
+      {text:'B. Thư mục nhỏ nhất', correct:false},
+      {text:'C. Thư mục bị xóa', correct:false},
+      {text:'D. Thư mục rỗng', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 6: Mỗi tệp tin thường nằm ở vị trí:', options:[
+      {text:'A. Trên nhánh', correct:false},
+      {text:'B. Ở cuối nhánh', correct:true},
+      {text:'C. Ở đầu nhánh', correct:false},
+      {text:'D. Ở gốc cây', correct:false}
+    ]},
+
+    { level:2, type:'multiple-choice', question:'Câu 7: Sơ đồ hình cây giúp em hiểu rõ điều gì về máy tính?', options:[
+      {text:'A. Cấu trúc sắp xếp dữ liệu trong máy tính', correct:true},
+      {text:'B. Cách vẽ tranh', correct:false},
+      {text:'C. Cách chơi game', correct:false},
+      {text:'D. Cách bật tắt máy', correct:false}
+    ]},
+    { level:2, type:'matching', question:'Câu 8: Hãy nối cột A với cột B cho đúng', left:[
+      '1. Thư mục cha','2. Thư mục con','3. Tệp tin'
+    ], right:[
+      'a. Nằm trong thư mục khác','b. Chứa các thư mục hoặc tệp tin khác','c. Nằm ở cuối nhánh của sơ đồ'
+    ], pairs:[
+      ['1. Thư mục cha','b. Chứa các thư mục hoặc tệp tin khác'],
+      ['2. Thư mục con','a. Nằm trong thư mục khác'],
+      ['3. Tệp tin','c. Nằm ở cuối nhánh của sơ đồ']
+    ]},
+    { level:2, type:'true-false', question:'Câu 9a: Một thư mục có thể chứa nhiều thư mục con.', answer:true },
+    { level:2, type:'true-false', question:'Câu 9b: Một tệp tin có thể chứa thư mục khác.', answer:false },
+    { level:2, type:'multiple-choice', question:'Câu 10: Khi nhìn vào sơ đồ hình cây, em có thể biết điều gì?', options:[
+      {text:'A. Vị trí của các thư mục và tệp tin', correct:true},
+      {text:'B. Màu sắc thư mục', correct:false},
+      {text:'C. Tên của các phần mềm chơi game', correct:false},
+      {text:'D. Hình dáng chuột máy tính', correct:false}
+    ]},
+    { level:2, type:'fill-in-blank', question:'Câu 11: Thư mục nằm trong một thư mục khác được gọi là ….', answer:'thư mục con' },
+    { level:2, type:'matching', question:'Câu 12: Hãy nối hành động với ý nghĩa đúng', left:[
+      '1. Tạo thư mục mới','2. Xem sơ đồ hình cây','3. Đặt tên thư mục'
+    ], right:[
+      'a. Biết vị trí các tệp trong máy tính','b. Sắp xếp dữ liệu gọn gàng hơn','c. Dễ nhận biết nội dung thư mục'
+    ], pairs:[
+      ['1. Tạo thư mục mới','b. Sắp xếp dữ liệu gọn gàng hơn'],
+      ['2. Xem sơ đồ hình cây','a. Biết vị trí các tệp trong máy tính'],
+      ['3. Đặt tên thư mục','c. Dễ nhận biết nội dung thư mục']
+    ]},
+
+    { level:3, type:'fill-in-blank', question:'Câu 13: Nêu ví dụ sắp xếp thư mục theo sơ đồ hình cây.', answer:'Ví dụ: Học tập → Toán, Tiếng Việt → mỗi thư mục con có các bài tập riêng.' },
+    { level:3, type:'fill-in-blank', question:'Câu 14: Khi thấy tệp tin lộn xộn không theo thứ tự, em sẽ làm gì?', answer:'Sắp xếp lại, tạo thêm thư mục con để dễ tìm hơn.' },
+    { level:3, type:'fill-in-blank', question:'Câu 15: Chỉ ra đâu là thư mục gốc, thư mục con và tệp tin trong hình.', answer:'Thư mục gốc ở trên cùng; thư mục con là nhánh dưới; tệp tin ở cuối nhánh.' }
+  ]
+}
+,
+
+"Bài 9": {
+  title: "Bài 9: Thực hành với tệp và thư mục",
+  questions: [
+    { level:1, type:'multiple-choice', question:'Câu 1: Tệp (file) là gì?', options:[
+      {text:'A. Là nơi chứa các thư mục', correct:false},
+      {text:'B. Là nơi lưu trữ thông tin như văn bản, hình ảnh, bài hát, video...', correct:true},
+      {text:'C. Là biểu tượng của phần mềm', correct:false},
+      {text:'D. Là tên của thư mục', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 2: Thư mục (folder) là gì?', options:[
+      {text:'A. Là tập hợp chứa các tệp hoặc thư mục khác', correct:true},
+      {text:'B. Là một phần mềm trò chơi', correct:false},
+      {text:'C. Là thanh công cụ của máy tính', correct:false},
+      {text:'D. Là tệp văn bản', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 3: Để tạo thư mục mới, ta thực hiện thao tác nào?', options:[
+      {text:'A. Nháy chuột phải → New → Folder', correct:true},
+      {text:'B. Nhấn phím Delete', correct:false},
+      {text:'C. Mở trình duyệt web', correct:false},
+      {text:'D. Kéo tệp vào thùng rác', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 4: Khi muốn đổi tên thư mục, ta:', options:[
+      {text:'A. Nháy chuột phải → chọn Rename', correct:true},
+      {text:'B. Nhấn phím Ctrl + N', correct:false},
+      {text:'C. Nhấn phím Delete', correct:false},
+      {text:'D. Nháy đúp chuột vào thư mục', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 5: Khi xóa một tệp, tệp đó sẽ được chuyển đến:', options:[
+      {text:'A. Thùng rác (Recycle Bin)', correct:true},
+      {text:'B. Thư mục ẩn', correct:false},
+      {text:'C. Màn hình nền', correct:false},
+      {text:'D. Thanh công cụ', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 6: Để mở tệp, em cần:', options:[
+      {text:'A. Nháy đúp chuột vào biểu tượng của tệp', correct:true},
+      {text:'B. Kéo tệp ra màn hình nền', correct:false},
+      {text:'C. Nhấn phím Delete', correct:false},
+      {text:'D. Mở phần mềm khác', correct:false}
+    ]},
+
+    { level:2, type:'matching', question:'Câu 7: Hãy nối cột A với cột B cho đúng', left:[
+      '1. Thư mục','2. Tệp','3. Thùng rác'
+    ], right:[
+      'a. Chứa các tệp và thư mục con','b. Lưu trữ thông tin, dữ liệu','c. Nơi chứa tệp hoặc thư mục bị xóa'
+    ], pairs:[
+      ['1. Thư mục','a. Chứa các tệp và thư mục con'],
+      ['2. Tệp','b. Lưu trữ thông tin, dữ liệu'],
+      ['3. Thùng rác','c. Nơi chứa tệp hoặc thư mục bị xóa']
+    ]},
+    { level:2, type:'true-false', question:'Câu 8a: Một thư mục có thể chứa nhiều tệp tin.', answer:true },
+    { level:2, type:'true-false', question:'Câu 8b: Khi xóa tệp trong máy tính, tệp đó biến mất hoàn toàn.', answer:false },
+    { level:2, type:'fill-in-blank', question:'Câu 9: Để xóa tệp hoặc thư mục, ta có thể chọn tệp rồi nhấn phím …….', answer:'Delete' },
+    { level:2, type:'multiple-choice', question:'Câu 10: Khi muốn di chuyển tệp từ thư mục này sang thư mục khác, ta có thể:', options:[
+      {text:'A. Dùng thao tác kéo thả chuột', correct:true},
+      {text:'B. Nhấn phím Delete', correct:false},
+      {text:'C. Tắt máy tính', correct:false},
+      {text:'D. Nhấn Enter', correct:false}
+    ]},
+    { level:2, type:'matching', question:'Câu 11: Hãy nối thao tác với công dụng đúng', left:[
+      '1. New → Folder','2. Rename','3. Delete'
+    ], right:[
+      'a. Đổi tên thư mục hoặc tệp','b. Tạo thư mục mới','c. Xóa thư mục hoặc tệp'
+    ], pairs:[
+      ['1. New → Folder','b. Tạo thư mục mới'],
+      ['2. Rename','a. Đổi tên thư mục hoặc tệp'],
+      ['3. Delete','c. Xóa thư mục hoặc tệp']
+    ]},
+    { level:2, type:'fill-in-blank', question:'Câu 12: Thùng rác trên máy tính có tên tiếng Anh là …….', answer:'Recycle Bin' },
+
+    { level:3, type:'fill-in-blank', question:'Câu 13: Em hãy nêu một ví dụ về việc tạo thư mục để sắp xếp học tập gọn gàng hơn.', answer:'Ví dụ: Tạo thư mục “Bài học lớp 3” với các thư mục con Toán, Tiếng Việt, Tin học.' },
+    { level:3, type:'fill-in-blank', question:'Câu 14: Khi thấy máy tính có quá nhiều tệp nằm lộn xộn trên màn hình, em sẽ làm gì để dễ tìm hơn?', answer:'Tạo thư mục theo chủ đề và sắp xếp tệp vào đó.' },
+    { level:3, type:'fill-in-blank', question:'Câu 15: Thao tác nào đúng để đổi tên và xóa tệp theo yêu cầu?', answer:'Đổi tên: Nháy chuột phải → Rename. Xóa: Nháy chuột phải → Delete.' }
+  ]
+}
+,
+
+"Bài 10": {
+  title: "Bài 10: Bảo vệ thông tin khi dùng máy tính",
+  questions: [
+    { level:1, type:'multiple-choice', question:'Câu 1: Bảo vệ thông tin khi dùng máy tính có nghĩa là:', options:[
+      {text:'A. Không cho ai mượn máy tính', correct:false},
+      {text:'B. Giữ cho thông tin của mình được an toàn, không bị mất hoặc bị xem trộm', correct:true},
+      {text:'C. Xóa hết tệp trong máy tính', correct:false},
+      {text:'D. Chia sẻ thông tin cho mọi người', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 2: Mật khẩu là gì?', options:[
+      {text:'A. Là một đoạn chữ hoặc số giúp bảo vệ thông tin cá nhân', correct:true},
+      {text:'B. Là tên đăng nhập của em', correct:false},
+      {text:'C. Là trò chơi trên máy tính', correct:false},
+      {text:'D. Là hình nền máy tính', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 3: Em nên đặt mật khẩu như thế nào để bảo vệ tốt nhất?', options:[
+      {text:'A. Dễ đoán như “123456” hoặc “abcd”', correct:false},
+      {text:'B. Ngắn, dễ nhớ', correct:false},
+      {text:'C. Có cả chữ, số và ký hiệu đặc biệt', correct:true},
+      {text:'D. Không đặt mật khẩu', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 4: Khi dùng máy tính công cộng, em nên:', options:[
+      {text:'A. Đăng nhập rồi quên đăng xuất', correct:false},
+      {text:'B. Không đăng nhập tài khoản cá nhân', correct:true},
+      {text:'C. Ghi mật khẩu ra giấy dán cạnh máy', correct:false},
+      {text:'D. Lưu mật khẩu vào trình duyệt', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 5: Khi có người lạ hỏi thông tin cá nhân, em nên:', options:[
+      {text:'A. Nói thật để kết bạn', correct:false},
+      {text:'B. Không trả lời và báo người lớn', correct:true},
+      {text:'C. Gửi ảnh và thông tin của mình', correct:false},
+      {text:'D. Đăng lên mạng cho vui', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 6: Dấu hiệu nào cho thấy máy tính có thể bị nhiễm virus?', options:[
+      {text:'A. Máy hoạt động bình thường', correct:false},
+      {text:'B. Máy chậm, xuất hiện cửa sổ lạ hoặc tệp tự mất', correct:true},
+      {text:'C. Màn hình sáng rõ hơn', correct:false},
+      {text:'D. Máy tự tắt do hết pin', correct:false}
+    ]},
+
+    { level:2, type:'matching', question:'Câu 7: Nối cột A với cột B cho đúng', left:[
+      '1. Mật khẩu','2. Virus máy tính','3. Sao lưu dữ liệu'
+    ], right:[
+      'a. Giúp bảo vệ tài khoản cá nhân','b. Có thể làm hỏng hoặc xóa dữ liệu','c. Lưu thông tin quan trọng ở nơi khác'
+    ], pairs:[
+      ['1. Mật khẩu','a. Giúp bảo vệ tài khoản cá nhân'],
+      ['2. Virus máy tính','b. Có thể làm hỏng hoặc xóa dữ liệu'],
+      ['3. Sao lưu dữ liệu','c. Lưu thông tin quan trọng ở nơi khác']
+    ]},
+    { level:2, type:'true-false', question:'Câu 8a: Không nên chia sẻ mật khẩu cho bạn bè.', answer:true },
+    { level:2, type:'true-false', question:'Câu 8b: Khi thấy thư lạ, em nên mở ngay để xem nội dung.', answer:false },
+    { level:2, type:'fill-in-blank', question:'Câu 9: Để bảo vệ thông tin, em nên cài đặt ………………. trên máy tính.', answer:'phần mềm diệt virus' },
+    { level:2, type:'multiple-choice', question:'Câu 10: Khi máy tính bị nhiễm virus, em nên làm gì?', options:[
+      {text:'A. Tiếp tục sử dụng bình thường', correct:false},
+      {text:'B. Báo người lớn hoặc thầy cô để kiểm tra', correct:true},
+      {text:'C. Cài thêm trò chơi', correct:false},
+      {text:'D. Xóa ngẫu nhiên các tệp', correct:false}
+    ]},
+    { level:2, type:'matching', question:'Câu 11: Hãy nối thao tác với công dụng', left:[
+      '1. Đặt mật khẩu','2. Sao lưu dữ liệu','3. Cài phần mềm diệt virus'
+    ], right:[
+      'a. Giúp người khác không mở được máy của em','b. Giữ thông tin an toàn khi máy hỏng','c. Phát hiện và tiêu diệt virus'
+    ], pairs:[
+      ['1. Đặt mật khẩu','a. Giúp người khác không mở được máy của em'],
+      ['2. Sao lưu dữ liệu','b. Giữ thông tin an toàn khi máy hỏng'],
+      ['3. Cài phần mềm diệt virus','c. Phát hiện và tiêu diệt virus']
+    ]},
+    { level:2, type:'fill-in-blank', question:'Câu 12: Không nên tải ……………….. hoặc ………………. từ những trang web không đáng tin cậy.', answer:'phần mềm; tệp tin' },
+
+    { level:3, type:'fill-in-blank', question:'Câu 13: Em sẽ làm gì nếu bạn cùng lớp xin mật khẩu tài khoản học trực tuyến của em?', answer:'Không cho mật khẩu; nếu cần giúp, nhờ cô giáo hỗ trợ bạn.' },
+    { level:3, type:'fill-in-blank', question:'Câu 14: Hãy nêu 2 việc em có thể làm để bảo vệ thông tin trong máy tính.', answer:'Đặt mật khẩu mạnh; cài phần mềm diệt virus và không mở tệp lạ.' },
+    { level:3, type:'fill-in-blank', question:'Câu 15: Hãy chỉ ra 2 thao tác trong hình giúp bảo vệ thông tin.', answer:'Đặt mật khẩu và sao lưu dữ liệu lên đám mây.' }
+  ]
+}
+,
+
+"Bài 11": {
+  title: "Bài 11: Bài trình chiếu của em",
+  questions: [
+    { level:1, type:'multiple-choice', question:'Câu 1: Phần mềm giúp tạo bài trình chiếu là:', options:[
+      {text:'A. Word', correct:false},
+      {text:'B. Paint', correct:false},
+      {text:'C. PowerPoint', correct:true},
+      {text:'D. Excel', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 2: Một bài trình chiếu gồm nhiều:', options:[
+      {text:'A. Trang giấy', correct:false},
+      {text:'B. Trang chiếu (Slide)', correct:true},
+      {text:'C. Tệp nhạc', correct:false},
+      {text:'D. Bức tranh', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 3: Để tạo trang chiếu mới, em chọn:', options:[
+      {text:'A. Insert → New Slide', correct:true},
+      {text:'B. File → Save', correct:false},
+      {text:'C. View → Zoom', correct:false},
+      {text:'D. Home → Delete', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 4: Khi muốn chèn hình ảnh vào slide, em chọn:', options:[
+      {text:'A. Insert → Picture', correct:true},
+      {text:'B. Design → Themes', correct:false},
+      {text:'C. File → Save', correct:false},
+      {text:'D. Review → Spell Check', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 5: Trong bài trình chiếu, chữ viết được gọi là:', options:[
+      {text:'A. Văn bản', correct:true},
+      {text:'B. Hình nền', correct:false},
+      {text:'C. Tiêu đề', correct:false},
+      {text:'D. Ảnh chèn', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 6: Khi muốn xem toàn bộ bài trình chiếu, em chọn:', options:[
+      {text:'A. File → Print', correct:false},
+      {text:'B. Slide Show → From Beginning', correct:true},
+      {text:'C. Home → Copy', correct:false},
+      {text:'D. Insert → Shape', correct:false}
+    ]},
+
+    { level:2, type:'matching', question:'Câu 7: Nối cột A với cột B cho đúng', left:[
+      '1. Slide','2. PowerPoint','3. Slide Show'
+    ], right:[
+      'a. Trang trình chiếu trong bài','b. Phần mềm tạo bài trình chiếu','c. Chế độ trình chiếu bài của em'
+    ], pairs:[
+      ['1. Slide','a. Trang trình chiếu trong bài'],
+      ['2. PowerPoint','b. Phần mềm tạo bài trình chiếu'],
+      ['3. Slide Show','c. Chế độ trình chiếu bài của em']
+    ]},
+    { level:2, type:'true-false', question:'Câu 8a: Trong PowerPoint, chỉ có thể chèn chữ, không thể chèn hình.', answer:false },
+    { level:2, type:'true-false', question:'Câu 8b: Có thể tạo nhiều trang chiếu trong một bài trình chiếu.', answer:true },
+    { level:2, type:'fill-in-blank', question:'Câu 9: Mỗi bài trình chiếu thường có một trang đầu gọi là …….', answer:'trang tiêu đề' },
+    { level:2, type:'multiple-choice', question:'Câu 10: Khi muốn chèn âm thanh vào bài trình chiếu, em chọn:', options:[
+      {text:'A. Insert → Audio', correct:true},
+      {text:'B. Insert → Picture', correct:false},
+      {text:'C. Design → Format', correct:false},
+      {text:'D. Review → Comment', correct:false}
+    ]},
+    { level:2, type:'matching', question:'Câu 11: Hãy nối thao tác với công dụng', left:[
+      '1. Insert → New Slide','2. Insert → Picture','3. Slide Show → From Beginning'
+    ], right:[
+      'a. Tạo trang chiếu mới','b. Chèn hình ảnh','c. Xem bài trình chiếu từ đầu'
+    ], pairs:[
+      ['1. Insert → New Slide','a. Tạo trang chiếu mới'],
+      ['2. Insert → Picture','b. Chèn hình ảnh'],
+      ['3. Slide Show → From Beginning','c. Xem bài trình chiếu từ đầu']
+    ]},
+    { level:2, type:'fill-in-blank', question:'Câu 12: Để lưu bài trình chiếu, ta chọn File → …….. → chọn nơi lưu và đặt tên tệp.', answer:'Save' },
+
+    { level:3, type:'fill-in-blank', question:'Câu 13: Em hãy nêu ví dụ về chủ đề bài trình chiếu mà em có thể tự tạo.', answer:'Ví dụ: Gia đình em; Trường em; Bảo vệ môi trường.' },
+    { level:3, type:'fill-in-blank', question:'Câu 14: Khi trình chiếu, nếu thấy hình ảnh chưa đẹp, em có thể làm gì để bài trình chiếu hấp dẫn hơn?', answer:'Chỉnh kích thước ảnh, thêm hiệu ứng hoặc chọn nền đẹp.' },
+    { level:3, type:'fill-in-blank', question:'Câu 15: a) Tên phần mềm đang dùng? b) Slide “Cảm ơn” dùng để làm gì?', answer:'a) PowerPoint; b) Kết thúc bài trình chiếu và gửi lời chào.' }
+  ]
+}
+,
+
+"Bài 12": {
+  title: "Bài 12: Tìm hiểu về thế giới tự nhiên",
+  questions: [
+    { level:1, type:'multiple-choice', question:'Câu 1: Internet giúp em tìm hiểu về điều gì?', options:[
+      {text:'A. Các loài động vật, thực vật', correct:true},
+      {text:'B. Trò chơi điện tử', correct:false},
+      {text:'C. Quảng cáo mua hàng', correct:false},
+      {text:'D. Tin tức người nổi tiếng', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 2: Để tìm hiểu về “rừng nhiệt đới”, em có thể dùng công cụ nào trên máy tính?', options:[
+      {text:'A. Paint', correct:false},
+      {text:'B. Trình duyệt web', correct:true},
+      {text:'C. Word', correct:false},
+      {text:'D. Máy tính cầm tay', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 3: Khi tìm kiếm thông tin trên Internet, em gõ từ khóa vào đâu?', options:[
+      {text:'A. Thanh địa chỉ', correct:false},
+      {text:'B. Ô tìm kiếm của trình duyệt', correct:true},
+      {text:'C. Bảng tính Excel', correct:false},
+      {text:'D. Hộp thoại trong Word', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 4: Đây là biểu tượng của phần mềm nào?', options:[
+      {text:'A. Microsoft Word', correct:false},
+      {text:'B. Google Chrome', correct:true},
+      {text:'C. Paint', correct:false},
+      {text:'D. PowerPoint', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 5: Khi muốn xem hình ảnh về “hoa hồng”, em nên chọn mục nào trên Google?', options:[
+      {text:'A. Tất cả (All)', correct:false},
+      {text:'B. Hình ảnh (Images)', correct:true},
+      {text:'C. Video', correct:false},
+      {text:'D. Tin tức', correct:false}
+    ]},
+    { level:1, type:'multiple-choice', question:'Câu 6: Để đóng trang web đang mở, em bấm nút nào?', options:[
+      {text:'A. Dấu X (Close)', correct:true},
+      {text:'B. Dấu + (New Tab)', correct:false},
+      {text:'C. Dấu ↻ (Refresh)', correct:false},
+      {text:'D. Biểu tượng kính lúp (Search)', correct:false}
+    ]},
+
+    { level:2, type:'multiple-choice', question:'Câu 7: Vì sao cần chọn lọc thông tin khi tìm hiểu trên Internet?', options:[
+      {text:'A. Vì tất cả thông tin đều đúng', correct:false},
+      {text:'B. Vì có thông tin sai, không chính xác', correct:true},
+      {text:'C. Vì mất thời gian đọc', correct:false},
+      {text:'D. Vì Internet không có thông tin thật', correct:false}
+    ]},
+    { level:2, type:'multiple-choice', question:'Câu 8: Khi em tìm hiểu về động vật quý hiếm, em nên chọn trang web nào?', options:[
+      {text:'A. Trang giải trí', correct:false},
+      {text:'B. Trang bán hàng', correct:false},
+      {text:'C. Trang giáo dục hoặc khoa học', correct:true},
+      {text:'D. Trang phim hoạt hình', correct:false}
+    ]},
+    { level:2, type:'true-false', question:'Câu 9a: Em có thể tin vào mọi thông tin đọc được trên mạng.', answer:false },
+    { level:2, type:'true-false', question:'Câu 9b: Cần hỏi người lớn khi truy cập trang web lạ.', answer:true },
+    { level:2, type:'matching', question:'Câu 10: Nối các cột cho đúng', left:[
+      '1. Động vật sống ở biển','2. Thực vật rừng xanh','3. Chim sống trên cao'
+    ], right:[
+      'a. Rừng nhiệt đới','b. Biển','c. Bầu trời'
+    ], pairs:[
+      ['1. Động vật sống ở biển','b. Biển'],
+      ['2. Thực vật rừng xanh','a. Rừng nhiệt đới'],
+      ['3. Chim sống trên cao','c. Bầu trời']
+    ]},
+    { level:2, type:'multiple-choice', question:'Câu 11: Khi tìm hình ảnh cây cối, em nên nhập từ khóa nào vào ô tìm kiếm?', options:[
+      {text:'A. cây cối', correct:true},
+      {text:'B. thú rừng', correct:false},
+      {text:'C. trò chơi', correct:false},
+      {text:'D. máy tính', correct:false}
+    ]},
+    { level:2, type:'multiple-choice', question:'Câu 12: Tại sao cần dùng Internet một cách an toàn?', options:[
+      {text:'A. Vì có thể gặp trang web xấu, độc hại', correct:true},
+      {text:'B. Vì Internet không có lợi', correct:false},
+      {text:'C. Vì máy tính không mở được mạng', correct:false},
+      {text:'D. Vì tốn điện', correct:false}
+    ]},
+
+    { level:3, type:'fill-in-blank-choice', question:'Câu 13: Khi muốn biết thông tin về “khí hậu Việt Nam”, em mở (……) rồi nhập từ khóa (……).', choices:['trình duyệt web','khí hậu Việt Nam','Google Drive','máy tính cầm tay'], answer:['trình duyệt web','khí hậu Việt Nam'] },
+    { level:3, type:'matching', question:'Câu 14: Nối thao tác với hành động đúng', left:[
+      '1. Gõ từ khóa vào ô tìm kiếm','2. Nhấn Enter'
+    ], right:[
+      'a. Hiển thị kết quả tìm kiếm','b. Tìm thông tin em muốn biết'
+    ], pairs:[
+      ['1. Gõ từ khóa vào ô tìm kiếm','b. Tìm thông tin em muốn biết'],
+      ['2. Nhấn Enter','a. Hiển thị kết quả tìm kiếm']
+    ]},
+    { level:3, type:'multiple-choice', question:'Câu 15: Khi em tìm thấy hình ảnh kết quả tìm kiếm, em đã dùng công cụ nào?', options:[
+      {text:'A. Google Images', correct:true},
+      {text:'B. YouTube', correct:false},
+      {text:'C. Google Maps', correct:false},
+      {text:'D. PowerPoint', correct:false}
+    ]}
+  ]
+}
+,
+},
   "Lớp 4": {
     "Bài 1": {
       title: "Bài 1: Phần cứng và phần mềm của máy tính",
@@ -4370,7 +5100,7 @@ window.MINIGAME_CFG = {
 <script>
 (function(){
 // Updated API URL to the latest GAS deployment
-const AUTH_API = "https://script.google.com/macros/s/AKfycbyNcfoWBHaKcvvZr7L2i3u62_AhZmC53w-wS1PaW3SULV3-iUMP6kKH-4I7AGjOawO1/exec";
+const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6OlNmq-Dpv_hHsaYX0qjjTUqlFLYykVZ6gWVDWbJ7-9od0t/exec";
   const $ = (sel) => document.querySelector(sel);
   const modal = $("#auth-modal");
   const btnOpen = $("#auth-open-btn");
@@ -4985,10 +5715,10 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyNcfoWBHaKcvvZr7L2i3u
 <script>
 // 2) Constants & helpers
 // Updated API URL to the latest GAS deployment
-const AUTH_API = 'https://script.google.com/macros/s/AKfycbyNcfoWBHaKcvvZr7L2i3u62_AhZmC53w-wS1PaW3SULV3-iUMP6kKH-4I7AGjOawO1/exec';  // ← GAS /exec URL
+const AUTH_API = 'https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6OlNmq-Dpv_hHsaYX0qjjTUqlFLYykVZ6gWVDWbJ7-9od0t/exec';  // ← GAS /exec URL
 
 // v2.8.6: new Scoring API for start_run/submit_run/leaderboard calls
-const SCORING_API = 'https://script.google.com/macros/s/AKfycbyNcfoWBHaKcvvZr7L2i3u62_AhZmC53w-wS1PaW3SULV3-iUMP6kKH-4I7AGjOawO1/exec';
+const SCORING_API = 'https://script.google.com/macros/s/AKfycbxfQf59E4GdTbEgUhkKlh7H1ss9wNjBoXO8uAqNgtoxZatLaZw-S7etdIGfk7NUhldO/exec';
 const AUTH_KEY = "gau_auth";
 
 function getAuth(){ try { return JSON.parse(localStorage.getItem(AUTH_KEY) || "{}"); } catch(e){ return {}; } }
