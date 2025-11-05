@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- CHANGELOG: v3.5.2
   - Preserve custom avatar across login, refresh, logout/login cycles by merging auth on login and restoring from localStorage.
-  - Added caching of avatar_custom keyed by student_id when saving avatar.
+  - Added caching of avatar_custom keyed by gov_id when saving avatar.
   - Bootstrap now restores custom avatar from cache if server does not provide one.
   - Updated About modal to show version v3.5.2 explicitly.
   - Updated header logo to use data/images/logo.jpg (Trường Tiểu Học Võng La).
@@ -781,16 +781,16 @@ function renderResultsPage(){
   if(bar)    bar.style.width = '0%';
   if(barTxt) barTxt.textContent = '0 / 0';
   if(bestEl) bestEl.textContent = '—';
-  // Fetch user info via whoami to obtain token, grade and student_id
+  // Fetch user info via whoami to obtain token, grade and gov_id
   var auth = null;
   try { auth = getAuth(); } catch(_e2){}
   var token = auth && auth.token;
   if(!token){ return; }
-  // Call whoami via apiPost (returns student_id and grade)
+  // Call whoami via apiPost (returns gov_id and grade)
   apiPost('whoami', { token: token }).then(function(me){
     if(!me || !me.ok){ return; }
     var grade      = String(me.grade || '');
-    var student_id = String(me.student_id || '');
+    var gov_id = String(me.gov_id || '');
     // Fetch daily leaderboard to get today's points
     apiPost('leaderboard', { token: token, scope:'daily', limit:50 }).then(function(dailyRes){
       var today = 0;
@@ -798,7 +798,7 @@ function renderResultsPage(){
         var rows = (dailyRes && (dailyRes.rows || dailyRes.data || dailyRes.items)) || [];
         for(var i=0; i<rows.length; i++){
           var row = rows[i];
-          if(String(row.student_id) === student_id){ today = Number(row.points || row.score_final || 0); break; }
+          if(String(row.gov_id) === gov_id){ today = Number(row.points || row.score_final || 0); break; }
         }
       }catch(_e3){}
       // Determine daily cap based on grade (defaults to grade 4)
@@ -814,7 +814,7 @@ function renderResultsPage(){
           var rows2 = (allRes && (allRes.rows || allRes.data || allRes.items)) || [];
           for(var j=0; j<rows2.length; j++){
             var r2 = rows2[j];
-            if(String(r2.student_id) === student_id){ bestPoints = Number(r2.points || 0); break; }
+            if(String(r2.gov_id) === gov_id){ bestPoints = Number(r2.points || 0); break; }
           }
         }catch(_e4){}
         if(bestEl) bestEl.textContent = bestPoints;
@@ -4066,11 +4066,11 @@ try{
     <script data-module="user-results">
       (function(){
         'use strict';
-        // Utility: get current userId. Uses student_id if available, otherwise falls back to lowercased name+grade.
+        // Utility: get current userId. Uses gov_id if available, otherwise falls back to lowercased name+grade.
         function getUserId(){
           var auth = null;
           try { auth = (typeof getAuth === 'function') ? getAuth() : null; } catch(_){ auth = null; }
-          if(auth && auth.student_id){ return String(auth.student_id); }
+          if(auth && auth.gov_id){ return String(auth.gov_id); }
           var name = (auth && auth.name) ? String(auth.name) : 'anonymous';
           var grade= (auth && auth.grade)? String(auth.grade) : '';
           return (name + ':' + grade).toLowerCase();
@@ -5421,19 +5421,20 @@ window.MINIGAME_CFG = {
 <button class="flex-1 py-2 rounded-xl bg-gray-100" id="tab-register">Đăng ký</button>
 </div>
 <form class="space-y-3" id="form-login">
-<input autocomplete="username" class="w-full border rounded-xl p-3" name="student_id" placeholder="Mã định danh (vd: SA-0001)" required=""/>
+<input autocomplete="username" class="w-full border rounded-xl p-3" name="gov_id" placeholder="Mã Định Danh Bộ GD&ĐT" required=""/>
 <input autocomplete="current-password" class="w-full border rounded-xl p-3" name="pin" placeholder="PIN" required="" type="password"/>
 <div class="text-xs text-gray-500">Hoặc vào chế độ giáo viên: điền mật khẩu bên dưới.</div>
 <input class="w-full border rounded-xl p-3" name="teacher_pass" placeholder="Mật khẩu giáo viên (tuỳ chọn - 122025)" type="password"/>
 <button class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-3 font-bold" type="submit">Đăng nhập</button>
 </form>
 <form class="space-y-3 hidden" id="form-register">
+<div class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2">Chỉ học sinh có <b>Mã Định Danh Bộ GD&ĐT</b> đã được nhà trường nạp sẵn mới đăng ký được. Sau khi đăng ký thành công, hệ thống sẽ tự cấp <b>gov_id</b> cho bạn.</div>
 <input class="w-full border rounded-xl p-3" name="name" placeholder="Tên học sinh" required=""/>
 <div class="grid grid-cols-2 gap-3">
 <input class="border rounded-xl p-3" name="grade" placeholder="Khối (3/4/5)" required=""/>
 <input class="border rounded-xl p-3" name="class" placeholder="Lớp (vd: 5A)" required=""/>
 </div>
-<input class="w-full border rounded-xl p-3" name="student_id" placeholder="Mã định danh (tự đặt, không trùng)" required=""/>
+<input class="w-full border rounded-xl p-3" name="gov_id" placeholder="Mã Định Danh Bộ GD&ĐT (bắt buộc, đã được cấp)" required=""/>
 <input class="w-full border rounded-xl p-3" name="pin" placeholder="Tạo PIN (≥4 ký tự)" required="" type="password"/>
 <button class="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl p-3 font-bold" type="submit">Tạo tài khoản</button>
 </form>
@@ -5442,7 +5443,7 @@ window.MINIGAME_CFG = {
 <script>
 (function(){
 // Updated API URL to the latest GAS deployment
-const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6OlNmq-Dpv_hHsaYX0qjjTUqlFLYykVZ6gWVDWbJ7-9od0t/exec";
+const AUTH_API = "https://script.google.com/macros/s/AKfycbyBZC7beL0eb386iH7oXdLoT2GfcUqIghP0e-zVhIhRTSwsb1qKdk3_q7jRHZmkrdB5/exec";
   const $ = (sel) => document.querySelector(sel);
   const modal = $("#auth-modal");
   const btnOpen = $("#auth-open-btn");
@@ -5508,12 +5509,12 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
   formLogin && formLogin.addEventListener("submit", async (e)=>{
     e.preventDefault();
     const fd = new FormData(formLogin);
-    const student_id = String(fd.get("student_id")||"").trim();
+    const gov_id = String(fd.get("gov_id")||"").trim();
     const pin = String(fd.get("pin")||"").trim();
     const teacher_pass = String(fd.get("teacher_pass")||"").trim();
     try{
       showAlert("Đang đăng nhập...");
-      const payload = teacher_pass ? {action:"login", teacher_pass} : {action:"login", student_id, pin};
+      const payload = teacher_pass ? {action:"login", teacher_pass} : {action:"login", gov_id, pin};
       const data = await postJson(payload);
       if (!data || data.ok!==true) throw new Error(data && data.error ? data.error : "Đăng nhập thất bại");
       // Merge server response with any existing auth to preserve local fields (e.g. avatar_custom)
@@ -5526,7 +5527,7 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
       }
       // Still update the auth-only elements for legacy code
       try { renderAuthUI(); } catch(e){}
-      showAlert("Đăng nhập thành công! Xin chào " + (merged.name || merged.student_id), "ok");
+      showAlert("Đăng nhập thành công! Xin chào " + (merged.name || merged.gov_id), "ok");
       setTimeout(()=>{ closeModal(); }, 800);
       // Update any modal header/profile UI if available
       if (typeof hydrateModalHeader === 'function') {
@@ -5545,7 +5546,7 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
       name: String(fd.get("name")||"").trim(),
       grade: String(fd.get("grade")||"").trim(),
       class: String(fd.get("class")||"").trim(),
-      student_id: String(fd.get("student_id")||"").trim(),
+      gov_id: String(fd.get("gov_id")||"").trim(),
       pin: String(fd.get("pin")||"").trim()
     };
     try{
@@ -5554,7 +5555,7 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
       if (!data || data.ok!==true) throw new Error(data && data.error ? data.error : "Đăng ký thất bại");
       localStorage.setItem("gau_auth", JSON.stringify(data));
       try{ renderAuthUI(); }catch(e){}
-      showAlert("Tạo tài khoản thành công! Xin chào " + (data.name || data.student_id), "ok");
+      showAlert("Tạo tài khoản thành công! Xin chào " + (data.name || data.gov_id), "ok");
       setTimeout(()=>{ closeModal(); }, 900);
     }catch(err){
       showAlert(err.message||String(err));
@@ -5579,7 +5580,7 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
     if(logged){
       authEntry && authEntry.classList.add("hidden");
       accArea && accArea.classList.remove("hidden");
-      if (accName) accName.textContent = a.name || a.student_id || "Học sinh";
+      if (accName) accName.textContent = a.name || a.gov_id || "Học sinh";
       const meta = [a.grade ? ("Khối " + a.grade) : "", a.class ? ("Lớp " + a.class) : ""].filter(Boolean).join(" • ");
       accMeta && (accMeta.textContent = meta);
       // Sync info in modal
@@ -5768,6 +5769,102 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
   } else {
     window.showLeaderboard('daily');
   }
+})();
+</script>
+
+
+<!-- AUTH INTEGRATION (auto-injected) -->
+<script>
+(function(){'use strict';
+  const AUTH_API = "https://script.google.com/macros/s/AKfycbyBZC7beL0eb386iH7oXdLoT2GfcUqIghP0e-zVhIhRTSwsb1qKdk3_q7jRHZmkrdB5/exec";
+  function postJSON(url, data){
+    return fetch(url, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(data) })
+      .then(r => r.json());
+  }
+  function saveToken(t){ try{ localStorage.setItem('auth_token', t||''); }catch(e){} }
+  function getToken(){ try{ return localStorage.getItem('auth_token')||''; }catch(e){ return ''; } }
+  function uiStatus(msg, type){ 
+    let el = document.getElementById('auth-status'); 
+    if(!el){ el = document.createElement('div'); el.id='auth-status'; el.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:#111827;color:#fff;padding:10px 14px;border-radius:12px;z-index:99999;font-size:12px;box-shadow:0 8px 20px rgba(0,0,0,.2)'; document.body.appendChild(el);}
+    el.style.background = (type==='ok') ? '#059669' : (type==='warn' ? '#c2410c' : '#111827');
+    el.textContent = msg;
+    clearTimeout(window.__auth_toast_timer);
+    window.__auth_toast_timer = setTimeout(()=>{ el.remove(); }, 3000);
+  }
+
+  // REGISTER
+  const fr = document.getElementById('form-register');
+  if (fr) {
+    fr.addEventListener('submit', async function(e){ 
+      e.preventDefault();
+      const fd = new FormData(fr);
+      const payload = {
+        action: 'register',
+        // BACKEND yêu cầu các trường này (đã thống nhất): name, grade, class, pin, gov_id
+        name: String(fd.get('name')||'').trim(),
+        grade: String(fd.get('grade')||'').trim(),
+        'class': String(fd.get('class')||'').trim(),
+        pin: String(fd.get('pin')||'').trim(),
+        gov_id: String(fd.get('gov_id')||'').trim()
+      };
+      if (!payload.gov_id) return uiStatus('Vui lòng nhập Mã Định Danh Bộ GD&ĐT', 'warn');
+      try {
+        fr.querySelector('button[type=submit]')?.setAttribute('disabled','');
+        const res = await postJSON(AUTH_API, payload);
+        if (res && res.ok) {
+          saveToken(res.token);
+          uiStatus('Đăng ký thành công! Mã học sinh: ' + (res.gov_id||''), 'ok');
+          // điền ngược gov_id vào form đăng nhập nếu tồn tại
+          const si = document.querySelector('#form-login input[name=gov_id]');
+          if (si) si.value = res.gov_id||'';
+          // cập nhật tên hiển thị nếu có
+          const n = document.querySelector('[data-user-name]'); if(n) n.textContent = res.name||'';
+        } else {
+          uiStatus(res && res.error ? res.error : 'Đăng ký thất bại', 'err');
+        }
+      } catch(err){ uiStatus('Lỗi mạng: ' + err, 'err'); }
+      finally { fr.querySelector('button[type=submit]')?.removeAttribute('disabled'); }
+    });
+  }
+
+  // LOGIN
+  const fl = document.getElementById('form-login');
+  if (fl) {
+    fl.addEventListener('submit', async function(e){ 
+      e.preventDefault();
+      const fd = new FormData(fl);
+      const payload = { action:'login' };
+      const teacherPass = String(fd.get('teacher_pass')||'').trim();
+      const govId = String(fd.get('gov_id')||'').trim();
+      const pin = String(fd.get('pin')||'').trim();
+      if (teacherPass) { payload.teacher_pass = teacherPass; }
+      else { payload.gov_id = govId; payload.pin = pin; }
+      try {
+        fl.querySelector('button[type=submit]')?.setAttribute('disabled','');
+        const res = await postJSON(AUTH_API, payload);
+        if (res && res.ok) {
+          saveToken(res.token);
+          uiStatus('Đăng nhập thành công', 'ok');
+          const n = document.querySelector('[data-user-name]'); if(n) n.textContent = res.name||'';
+        } else {
+          uiStatus(res && res.error ? res.error : 'Đăng nhập thất bại', 'err');
+        }
+      } catch(err){ uiStatus('Lỗi mạng: ' + err, 'err'); }
+      finally { fl.querySelector('button[type=submit]')?.removeAttribute('disabled'); }
+    });
+  }
+
+  // WHOAMI on load -> tự khôi phục phiên
+  (async function(){
+    const t = getToken(); if(!t) return;
+    try {
+      const res = await postJSON(AUTH_API, { action:'whoami', token: t });
+      if(res && res.ok) {
+        const n = document.querySelector('[data-user-name]'); if(n) n.textContent = res.name||'';
+      }
+    } catch(_e){}
+  })();
+
 })();
 </script>
 
@@ -6035,7 +6132,7 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
           try{
             const daily = await apiPost('leaderboard', { token, scope:'daily', limit:50 });
             const rows = daily.rows || daily.data || daily.items || [];
-            const mine = rows.find(r => r.student_id === me.student_id);
+            const mine = rows.find(r => r.gov_id === me.gov_id);
             // new scoring API only returns `points` for each row
             if(mine) today = Number(mine.points || 0);
           }catch(e){}
@@ -6043,7 +6140,7 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
           try{
             const all = await apiPost('leaderboard', { token, scope:'all', limit:50 });
             const rows = all.rows || all.data || all.items || [];
-            const mine = rows.find(r => r.student_id === me.student_id);
+            const mine = rows.find(r => r.gov_id === me.gov_id);
             if(mine){
               bestScore = (typeof mine.points !== 'undefined') ? mine.points : '—';
               // bestTime and bestQuiz are not provided by the new API; leave as '—'
@@ -6103,7 +6200,7 @@ const res = await apiPost('leaderboard', { token, scope, limit:50 });
               const pts  = row.points || row.score || row.best_score_final || 0;
               const time = row.best_duration_ms || row.duration_ms || '—';
               const classes = [];
-              if(me && row.student_id === me.student_id) classes.push('p2-lb-row-me');
+              if(me && row.gov_id === me.gov_id) classes.push('p2-lb-row-me');
               if(rank === 1) classes.push('p2-lb-row-top1');
               else if(rank === 2) classes.push('p2-lb-row-top2');
               else if(rank === 3) classes.push('p2-lb-row-top3');
@@ -6214,7 +6311,7 @@ const res = await apiPost('leaderboard', { token, scope, limit:50 });
         if(bestScoreEl) bestScoreEl.textContent = '—';
         if(bestQuizEl)  bestQuizEl.textContent  = '—';
         if(bestTimeEl)  bestTimeEl.textContent  = '—';
-        if(!meCache || !meCache.student_id) return;
+        if(!meCache || !meCache.gov_id) return;
         const token = meCache.token;
         const grade = meCache.grade || '';
         const cap   = DAILY_CAPS[grade] || 0;
@@ -6223,7 +6320,7 @@ const res = await apiPost('leaderboard', { token, scope, limit:50 });
         try{
           const r = await apiPost('leaderboard', { token, scope:'daily', limit: 50 });
           const rows = r && r.rows ? r.rows : [];
-          const found = rows.find(x => x.student_id === meCache.student_id);
+          const found = rows.find(x => x.gov_id === meCache.gov_id);
           if(found){ todayPts = Number(found.points || found.score || 0); }
         }catch(err){}
         if(cap > 0){ const pct = Math.max(0, Math.min(100, Math.round((todayPts/cap)*100))); bar.style.width = pct + '%'; txt.textContent = `${todayPts} / ${cap}`; }
@@ -6233,7 +6330,7 @@ const res = await apiPost('leaderboard', { token, scope, limit:50 });
         try{
           const r = await apiPost('leaderboard', { token, scope:'all', limit: 50 });
           const rows = r && r.rows ? r.rows : [];
-          const found = rows.find(x => x.student_id === meCache.student_id);
+          const found = rows.find(x => x.gov_id === meCache.gov_id);
           if(found){ totalPts = Number(found.points || found.score || 0); }
         }catch(err){}
         if(bestScoreEl) bestScoreEl.textContent = totalPts;
@@ -6262,7 +6359,7 @@ const res = await apiPost('leaderboard', { token, scope, limit:50 });
             const pts  = row.points || row.score || row.best_score_final || 0;
             const time = row.best_duration_ms || row.duration_ms || '—';
             const classes = [];
-            if(meCache && row.student_id === meCache.student_id) classes.push('p2-lb-row-me');
+            if(meCache && row.gov_id === meCache.gov_id) classes.push('p2-lb-row-me');
             if(rank===1) classes.push('p2-lb-row-top1');
             else if(rank===2) classes.push('p2-lb-row-top2');
             else if(rank===3) classes.push('p2-lb-row-top3');
@@ -6314,10 +6411,10 @@ const res = await apiPost('leaderboard', { token, scope, limit:50 });
 <script>
 // 2) Constants & helpers
 // Updated API URL to the latest GAS deployment
-const AUTH_API = 'https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6OlNmq-Dpv_hHsaYX0qjjTUqlFLYykVZ6gWVDWbJ7-9od0t/exec';  // ← GAS /exec URL
+const AUTH_API = "https://script.google.com/macros/s/AKfycbyBZC7beL0eb386iH7oXdLoT2GfcUqIghP0e-zVhIhRTSwsb1qKdk3_q7jRHZmkrdB5/exec";  // ← GAS /exec URL
 
 // v2.8.6: new Scoring API for start_run/submit_run/leaderboard calls
-const SCORING_API = 'https://script.google.com/macros/s/AKfycbwcTzG4cT1EiIeJjXd_E98LarABmvE8RRcj3vM5HsHGkcLHGTHb0vF57H456i1hfh8W/exec';
+const SCORING_API = "https://script.google.com/macros/s/AKfycbyNUYxxZ73XtzO66sCS9xEcW05QRf_lVMQ5naVqeEGTgjyuyUq9nR9lGImpimWKtY5m/exec";
 const AUTH_KEY = "gau_auth";
 
 function getAuth(){ try { return JSON.parse(localStorage.getItem(AUTH_KEY) || "{}"); } catch(e){ return {}; } }
@@ -6431,8 +6528,8 @@ async function bootstrapAuth(){
     // Restore any previously saved custom avatar from localStorage if the server does not provide one.
     // This ensures that refreshing the page or reloading the app retains the selected avatar.
     try {
-      if (merged.student_id && !merged.avatar_custom) {
-        const cached = localStorage.getItem('gau_avatar_custom_' + merged.student_id);
+      if (merged.gov_id && !merged.avatar_custom) {
+        const cached = localStorage.getItem('gau_avatar_custom_' + merged.gov_id);
         if (cached) {
           merged.avatar_custom = cached;
         }
@@ -6473,20 +6570,20 @@ document.addEventListener('DOMContentLoaded', () => {
         legacyAuthModal.classList.add('hidden');
         legacyAuthModal.classList.remove('flex');
       }
-      const student_id = prompt('Nhập Mã định danh (student_id):');
-      if(student_id === null) return;
+      const gov_id = prompt('Nhập Mã định danh (gov_id):');
+      if(gov_id === null) return;
       const pin = prompt('Nhập PIN:');
       if(pin === null) return;
 
       let res;
       try {
-        res = await apiPost('login', { student_id, pin });
+        res = await apiPost('login', { gov_id, pin });
       } catch(err) {
         // Network or fetch error. Inform the user and gracefully fall back to
         // a local session so the UI can still be explored offline. The
-        // fallback record stores the entered student_id and a dummy token.
+        // fallback record stores the entered gov_id and a dummy token.
         alert('Không thể kết nối đến máy chủ. Vui lòng thử lại sau. Bạn sẽ được đăng nhập tạm thời.');
-        const fallback = { token: '__local__', name: student_id || 'Học sinh', student_id: student_id || '', grade: '', class: '' };
+        const fallback = { token: '__local__', name: gov_id || 'Học sinh', gov_id: gov_id || '', grade: '', class: '' };
         setAuth(fallback);
         renderLoggedInUI(fallback);
         hydrateModalHeader(fallback);
@@ -6924,11 +7021,11 @@ document.addEventListener('DOMContentLoaded', () => {
       delete updatedAuth.avatar_proxy_url_busted;
       delete updatedAuth.avatar_url_busted;
       setAuth(updatedAuth);
-      // Cache the custom avatar per student_id so it persists across reloads and logins
+      // Cache the custom avatar per gov_id so it persists across reloads and logins
       try {
         const a = getAuth() || {};
-        if (a.student_id && a.avatar_custom) {
-          localStorage.setItem('gau_avatar_custom_' + a.student_id, a.avatar_custom);
+        if (a.gov_id && a.avatar_custom) {
+          localStorage.setItem('gau_avatar_custom_' + a.gov_id, a.avatar_custom);
         }
       } catch (e) {
         // Ignore localStorage errors silently
