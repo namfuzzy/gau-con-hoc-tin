@@ -512,6 +512,50 @@
 </header>
 <!-- Khối chọn lớp + danh sách game -->
 <div class="bg-white/80 p-6 md:p-8 rounded-3xl shadow-xl backdrop-blur-sm">
+      <!-- BXH Trò chơi mini -->
+      <div id="mini-bxh" class="mb-6">
+        <h3 class="text-xl font-bold mb-3">🏆 BXH Trò chơi mini</h3>
+        <div class="grid grid-cols-3 gap-4 mb-4">
+          <div class="text-center">
+            <div class="text-5xl">🥇</div>
+            <div id="mini-top1-name" class="font-semibold mt-1">—</div>
+            <div id="mini-top1-class" class="text-sm text-gray-500">—</div>
+            <div id="mini-top1-points" class="text-blue-600 font-bold text-sm">0 điểm</div>
+          </div>
+          <div class="text-center">
+            <div class="text-5xl">🥈</div>
+            <div id="mini-top2-name" class="font-semibold mt-1">—</div>
+            <div id="mini-top2-class" class="text-sm text-gray-500">—</div>
+            <div id="mini-top2-points" class="text-blue-600 font-bold text-sm">0 điểm</div>
+          </div>
+          <div class="text-center">
+            <div class="text-5xl">🥉</div>
+            <div id="mini-top3-name" class="font-semibold mt-1">—</div>
+            <div id="mini-top3-class" class="text-sm text-gray-500">—</div>
+            <div id="mini-top3-points" class="text-blue-600 font-bold text-sm">0 điểm</div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm text-gray-500 italic">Top người chơi đạt điểm cao trong các mini game.</span>
+          <button id="mini-bxh-refresh" class="btn-hover px-3 py-1 rounded bg-blue-100 text-blue-700 hover:bg-blue-200">Tải lại</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-left text-sm">
+            <thead class="bg-blue-50 text-gray-700">
+              <tr>
+                <th class="px-2 py-1">#</th>
+                <th class="px-2 py-1">Tên</th>
+                <th class="px-2 py-1">Lớp</th>
+                <th class="px-2 py-1">Điểm</th>
+              </tr>
+            </thead>
+            <tbody id="mini-bxh-body" class="divide-y divide-gray-200">
+              <tr><td colspan="4" class="px-2 py-2 text-center text-gray-500">Đang tải dữ liệu...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="mini-bxh-err" class="text-sm text-red-600 mt-2 hidden">—</div>
+      </div>
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
 <div>
 <h3 class="text-xl font-bold">Chọn mini game theo <span class="text-blue-700" id="game-grade-label">Lớp 3</span></h3>
@@ -4037,6 +4081,121 @@ try{
 
 </script>
 
+    <!-- BXH mini game logic: gọi API điểm và bảng xếp hạng -->
+    <script>
+    // BXH mini game - fetch leaderboard & report score
+    (function(){
+      const MINI_API = 'https://script.google.com/macros/s/AKfycbzYZb5RbMEFSoEiOW1W90nP605kzraxmD3Ut1_tO_IKVBgD5TdMNHdh0EwAUHRJLI1pXQ/exec';
+      function getAuthToken(){
+        return localStorage.getItem('token') || localStorage.getItem('auth_token') || localStorage.getItem('gcht_token') || '';
+      }
+      async function fetchMiniBXH(){
+        const tbody = document.getElementById('mini-bxh-body');
+        const errEl = document.getElementById('mini-bxh-err');
+        // Reset top3 display
+        ['1','2','3'].forEach(i => {
+          const nm = document.getElementById('mini-top'+i+'-name');
+          const cl = document.getElementById('mini-top'+i+'-class');
+          const pt = document.getElementById('mini-top'+i+'-points');
+          if(nm) nm.textContent = '—';
+          if(cl) cl.textContent = '—';
+          if(pt) pt.textContent = '0 điểm';
+        });
+        if(tbody){
+          tbody.innerHTML = '<tr><td colspan="4" class="px-2 py-2 text-center text-gray-500">Đang tải dữ liệu...</td></tr>';
+        }
+        if(errEl){
+          errEl.classList.add('hidden');
+          errEl.textContent = '';
+        }
+        const token = getAuthToken() || '';
+        try {
+          const payload = { action: 'leaderboard', scope: 'daily', limit: 50 };
+          if (token) payload.token = token;
+          const res = await fetch(MINI_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+          if(!data.ok){
+            if(errEl){ errEl.classList.remove('hidden'); errEl.textContent = data.error || 'Lỗi tải BXH.'; }
+            return;
+          }
+          const rows = data.rows || [];
+          // Fill top3
+          rows.slice(0,3).forEach((r, idx) => {
+            const i = idx + 1;
+            const nm = document.getElementById('mini-top'+i+'-name');
+            const cl = document.getElementById('mini-top'+i+'-class');
+            const pt = document.getElementById('mini-top'+i+'-points');
+            if(nm) nm.textContent = r.name || '—';
+            if(cl) cl.textContent = r['class'] || r.grade || '';
+            if(pt) pt.textContent = (r.points || 0) + ' điểm';
+          });
+          // Build table rows
+          if(tbody){
+            let html = '';
+            let pos = 1;
+            rows.forEach(r => {
+              let label = pos;
+              if(pos === 1) label = '🥇'; else if(pos === 2) label = '🥈'; else if(pos === 3) label = '🥉';
+              const trClass = pos <= 3 ? 'bg-yellow-50' : '';
+              html += `<tr class="${trClass} divide-x divide-gray-200"><td class="px-2 py-1">${label}</td><td class="px-2 py-1">${r.name||''}</td><td class="px-2 py-1">${r['class']||r.grade||''}</td><td class="px-2 py-1 font-bold">${r.points||0}</td></tr>`;
+              pos++;
+            });
+            tbody.innerHTML = html;
+          }
+        } catch(ex){
+          if(errEl){ errEl.classList.remove('hidden'); errEl.textContent = 'Lỗi kết nối.'; }
+        }
+      }
+      async function miniStartRun(gameId){
+        const token = getAuthToken();
+        if(!token) return null;
+        try {
+          const res = await fetch(MINI_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'start_run', token: token, game_id: gameId })
+          });
+          const data = await res.json();
+          return (data && data.ok) ? data.run_id : null;
+        } catch(ex){ return null; }
+      }
+      async function miniSubmitScore(runId, gameId, rawPoints){
+        const token = getAuthToken();
+        if(!token) return;
+        try {
+          await fetch(MINI_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'submit_score', token: token, run_id: runId, game_id: gameId, raw_points: rawPoints })
+          });
+          // Refresh BXH soon after submit
+          if(window.fetchMiniBXH) setTimeout(window.fetchMiniBXH, 800);
+        } catch(ex){}
+      }
+      // Global export
+      window.fetchMiniBXH = fetchMiniBXH;
+      window.miniStartRun = miniStartRun;
+      window.miniSubmitScore = miniSubmitScore;
+      // Bind refresh button
+      document.addEventListener('DOMContentLoaded', function(){
+        const btn = document.getElementById('mini-bxh-refresh');
+        if(btn) btn.addEventListener('click', function(){ fetchMiniBXH(); });
+      });
+      // Override showPage to refresh BXH on page load
+      const prevShowPage = window.showPage;
+      window.showPage = function(id){
+        if(prevShowPage) prevShowPage(id);
+        if(id === 'page-game'){
+          setTimeout(fetchMiniBXH, 300);
+        }
+      };
+    })();
+    </script>
+
     <!-- BEGIN: user-results (local-only stats) -->
     <style data-module="user-results">
       /* Styles scoped to the results page. */
@@ -4970,13 +5129,26 @@ window.MINIGAME_CFG = {
     }catch(e){}
 
     const st = starsFromScore();
+    const rawPts = Math.max(0, Math.round(state.score));
     const msg = [
-      `Điểm: ${Math.max(0, Math.round(state.score))}`,
+      `Điểm: ${rawPts}`,
       `Sao: ${'⭐'.repeat(st) || '0'}`,
       `Đúng/ Tổng: ${state.correctCount} / ${state.totalCount}`
     ].join('\n');
     el('game-summary-text').innerText = msg;
     el('game-summary').classList.remove('hidden');
+    // Gửi điểm mini game lên server để cập nhật BXH
+    try {
+      const gameId = (state.current && (state.current.id || state.current.game_id || state.current.type)) || '';
+      // Nếu đã khai báo hàm miniStartRun/miniSubmitScore thì dùng để lưu điểm
+      if (window.miniStartRun && window.miniSubmitScore) {
+        window.miniStartRun(gameId).then(function(runId){
+          if (runId) {
+            window.miniSubmitScore(runId, gameId, rawPts);
+          }
+        });
+      }
+    } catch(e){}
   }
 
   function startTimer(sec){
