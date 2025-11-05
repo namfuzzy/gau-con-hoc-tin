@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- CHANGELOG: v3.5.2
+  - Preserve custom avatar across login, refresh, logout/login cycles by merging auth on login and restoring from localStorage.
+  - Added caching of avatar_custom keyed by student_id when saving avatar.
+  - Bootstrap now restores custom avatar from cache if server does not provide one.
+  - Updated About modal to show version v3.5.2 explicitly.
+  - Updated header logo to use data/images/logo.jpg (Trường Tiểu Học Võng La).
+  - Other modules and logic remain unchanged.
+-->
 
 <html lang="vi">
 <head>
@@ -247,6 +255,24 @@
 .bear-image-bright:hover {
   filter: brightness(1.22) saturate(1.28) contrast(1.05);
 }
+</style><style>
+/* --- Chatbot badge attention effect (minimal, isolated) --- */
+.chatbot-attention{
+  filter: drop-shadow(0 0 4px rgba(0, 170, 255, 0.55));
+  animation: chatbot-glow 2.2s ease-in-out infinite alternate, chatbot-wobble 4.5s ease-in-out infinite;
+  will-change: transform, filter;
+}
+@keyframes chatbot-glow{
+  from{ filter: drop-shadow(0 0 2px rgba(0, 170, 255, 0.25)); transform: translateZ(0); }
+  to{   filter: drop-shadow(0 0 8px rgba(0, 170, 255, 0.85)); }
+}
+@keyframes chatbot-wobble{
+  0%, 100%{ transform: rotate(0deg) translateY(0); }
+  20%{ transform: rotate(-1.5deg) translateY(-1px); }
+  40%{ transform: rotate(1.5deg) translateY(1px); }
+  60%{ transform: rotate(-1deg) translateY(0); }
+  80%{ transform: rotate(1deg) translateY(-1px); }
+}
 </style></head>
 <body class="bg-gradient-to-b from-sky-200 to-amber-200 min-h-screen p-4 md:p-8 text-gray-800 overflow-x-hidden">
 <!-- Trình phát âm thanh ẩn cho TTS -->
@@ -259,6 +285,9 @@
 <header class="flex flex-col items-center justify-center mb-10">
 <!-- (MỚI) Brand Header (Trường TH Võng La) -->
 <div class="flex items-center gap-3 mb-4">
+<!-- Updated: use the correct logo for Trường Tiểu Học Võng La -->
+<!-- Updated: correct the logo path to the official school logo; this was previously pointing to chatbot.png. -->
+<!-- Fixed: correct logo path (logo.jpg) and removed chatbot-attention class to match v3.4 header -->
 <img alt="Logo Trường TH Võng La" class="w-16 h-16 rounded-full border-2 border-white shadow-md" src="data/images/logo.jpg"/>
 <span class="text-3xl font-extrabold text-blue-800">Trường Tiểu Học Võng La</span>
 </div>
@@ -305,41 +334,98 @@
 <button class="grade-btn btn-hover" data-grade="Lớp 4">LỚP 4</button>
 <button class="grade-btn btn-hover" data-grade="Lớp 5">LỚP 5</button>
 </div>
-<!-- Cột 2: Nút chức năng 1 -->
-<div class="flex flex-col space-y-6">
-<!-- Video học -->
-<button class="menu-btn btn-hover bg-red-400 hover:bg-red-500 shadow-lg shadow-red-200" onclick="showPage('page-video')">
-<span class="icon-emoji">🎥</span>
-                    Video học
-                </button>
-<!-- Trò chơi mini -->
-<button class="menu-btn btn-hover bg-green-500 hover:bg-green-600 shadow-lg shadow-green-200" onclick="showPage('page-game')">
-<span class="icon-emoji">🎯</span>
-                    Trò chơi mini
-                </button>
+<!-- MODULES LAYOUT START -->
+<!-- Modules grid: 2 rows × 3 columns. This container spans the remaining columns on medium+ screens -->
+<div class="md:col-span-2">
+  <div class="modules-grid">
+    <!-- Video học -->
+    <button class="menu-btn btn-hover bg-red-400 hover:bg-red-500 shadow-lg shadow-red-200 module-card" onclick="showPage('page-video')">
+      <span class="icon-emoji">🎥</span>
+      <span>Video học</span>
+    </button>
+    <!-- Phiếu bài tập -->
+    <button class="menu-btn btn-hover bg-yellow-500 hover:bg-yellow-600 shadow-lg shadow-yellow-200 module-card" onclick="showPage('page-quiz')">
+      <!-- Changed icon from brain to a sheet of paper with a pen for better thematic match -->
+      <span class="icon-emoji">📝</span>
+      <span>Phiếu bài tập</span>
+    </button>
+    <!-- Bảng xếp hạng -->
+    <button class="menu-btn btn-hover bg-amber-400 hover:bg-amber-500 shadow-lg shadow-amber-300 rounded-2xl flex flex-col items-center justify-center gap-2 py-6 module-card" id="p2-scoreboard-card" onclick="p2ShowLeaderboard()" type="button">
+      <span class="text-5xl leading-none">🏆</span>
+      <span class="text-xl font-extrabold">Bảng Xếp Hạng</span>
+    </button>
+    <!-- Trò chơi mini -->
+    <button class="menu-btn btn-hover bg-green-500 hover:bg-green-600 shadow-lg shadow-green-200 module-card" onclick="showPage('page-game')">
+      <span class="icon-emoji">🎯</span>
+      <span>Trò chơi mini</span>
+    </button>
+    <!-- Kết quả học tập -->
+    <button class="menu-btn btn-hover bg-purple-500 hover:bg-purple-600 shadow-lg shadow-purple-200 module-card" onclick="showPage('page-results')">
+      <span class="icon-emoji">📈</span>
+      <span>Kết quả học tập</span>
+    </button>
+    <!-- Giới thiệu -->
+    <button class="menu-btn btn-hover bg-teal-400 hover:bg-teal-500 shadow-lg shadow-teal-200 module-card" id="about-button" data-open-about>
+      <span class="icon-emoji">ℹ️</span>
+      <span>Giới thiệu</span>
+    </button>
+  </div>
 </div>
-<!-- Cột 3: Nút chức năng 2 -->
-<div class="flex flex-col space-y-6">
-<!-- Phiếu bài tập -->
-<button class="menu-btn btn-hover bg-yellow-500 hover:bg-yellow-600 shadow-lg shadow-yellow-200" onclick="showPage('page-quiz')">
-<span class="icon-emoji">🧠</span>
-                    Phiếu bài tập
-                </button>
-<!-- Kết quả học tập -->
-<button class="menu-btn btn-hover bg-purple-500 hover:bg-purple-600 shadow-lg shadow-purple-200" onclick="showPage('page-results')">
-<span class="icon-emoji">📈</span>
-                    Kết quả học tập
-                </button>
-<!-- Bảng xếp hạng -->
-<!-- Nút BXH được thiết kế riêng: biểu tượng cúp lớn và chữ đậm dễ nhìn cho học sinh tiểu học -->
-<!-- Bảng xếp hạng: thẻ card lớn với cúp và nhãn. Chọn màu vàng tươi và bo tròn lớn cho phù hợp học sinh tiểu học -->
-<button class="menu-btn btn-hover bg-amber-400 hover:bg-amber-500 shadow-lg shadow-amber-300 rounded-2xl flex flex-col items-center justify-center gap-2 py-6" id="p2-scoreboard-card" onclick="p2ShowLeaderboard()" type="button">
-<span class="text-5xl leading-none">🏆</span>
-<span class="text-xl font-extrabold">Bảng Xếp Hạng</span>
-</button>
-</div>
+<!-- MODULES LAYOUT END -->
 </main>
 </div> <!-- Kết thúc page-home -->
+<!-- MODULES STYLE START -->
+<style>
+  /* Responsive grid for modules: 3 columns on large screens, 2 on medium, 1 on small */
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 900px) {
+    .modules-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 600px) {
+    .modules-grid {
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
+  /* Module card flex alignment */
+  .modules-grid .module-card {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    width: 100%;
+  }
+  /* About modal base hidden state */
+  #about-modal {
+    display: none;
+  }
+  #about-modal.show {
+    display: flex;
+  }
+  #about-modal .modal-content {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    position: relative;
+  }
+  #about-modal .modal-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+</style>
+<!-- MODULES STYLE END -->
 <!-- ======================================================= -->
 <!-- ==== MODULE 1: VIDEO BÀI HỌC (ẨN) ==== -->
 <!-- ======================================================= -->
@@ -802,7 +888,7 @@ const quizData = {
           {text:'Em không nhận thông tin', correct:false},
           {text:'Em đang chơi trò chơi', correct:false}
         ]},
-        { level:3, type:'fill-in-blank-choice', question:'Câu 14: Em thấy trời nhiều mây đen và nghe tiếng sấm, em (chọn)… Em điền: Em ... vì em ...', sentence:'Em [BLANK] vì em [BLANK].', options:['Mang ô đi học','Không mang gì'], correctChoice:'Mang ô đi học', correctAnswers:['mang ô đi học','dự đoán trời sẽ mưa'] },
+        { level:3, type:'multiple-choice', question:'Câu 14: Em thấy trời nhiều mây đen và nghe tiếng sấm, em nên làm gì?', options:[{text:'Mang ô đi học', correct:true},{text:'Không mang gì', correct:false},{text:'Ra ngoài chơi dưới mưa', correct:false},{text:'Bỏ học', correct:false}] },
         { level:3, type:'matching-image', question:'Câu 15: Quan sát hình và nối với quyết định phù hợp:', columnA:[{text:'🌞 Trời nắng', image:'svg:sun'},{text:'☔ Trời mưa', image:'svg:rain'},{text:'❄️ Trời lạnh', image:'svg:cold'}], columnB:['a. Đội mũ, mặc áo chống nắng','b. Mang ô, mặc áo mưa','c. Mặc áo ấm'], correctMatches:{'🌞 Trời nắng':'a. Đội mũ, mặc áo chống nắng','☔ Trời mưa':'b. Mang ô, mặc áo mưa','❄️ Trời lạnh':'c. Mặc áo ấm'} }
       ]
     },
@@ -3950,6 +4036,250 @@ try{
 })();
 
 </script>
+
+    <!-- BEGIN: user-results (local-only stats) -->
+    <style data-module="user-results">
+      /* Styles scoped to the results page. */
+      #page-results #user-results-container {
+        margin-top: 1.5rem;
+      }
+      #page-results table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+      }
+      #page-results th,
+      #page-results td {
+        padding: 0.5rem 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb; /* gray-200 */
+      }
+      #page-results thead th {
+        background-color: #f9fafb; /* gray-50 */
+        font-weight: 600;
+        color: #374151; /* gray-700 */
+      }
+      #page-results tbody tr:nth-child(odd) {
+        background-color: #fdfdfd; /* subtle alternating rows */
+      }
+    </style>
+    <script data-module="user-results">
+      (function(){
+        'use strict';
+        // Utility: get current userId. Uses student_id if available, otherwise falls back to lowercased name+grade.
+        function getUserId(){
+          var auth = null;
+          try { auth = (typeof getAuth === 'function') ? getAuth() : null; } catch(_){ auth = null; }
+          if(auth && auth.student_id){ return String(auth.student_id); }
+          var name = (auth && auth.name) ? String(auth.name) : 'anonymous';
+          var grade= (auth && auth.grade)? String(auth.grade) : '';
+          return (name + ':' + grade).toLowerCase();
+        }
+        // Load stats for current user from localStorage
+        function loadStats(){
+          var uid = getUserId();
+          var key = 'gchth:stats:' + uid;
+          try {
+            var raw = localStorage.getItem(key);
+            if(raw){ return JSON.parse(raw); }
+          }catch(e){ /* ignore */ }
+          // default structure
+          return { runs: [], agg: { correct: 0, total: 0, count: 0 }, bestTotal: 0, daily: {} };
+        }
+        // Save stats to localStorage
+        function saveStats(stats){
+          var uid = getUserId();
+          var key = 'gchth:stats:' + uid;
+          try {
+            localStorage.setItem(key, JSON.stringify(stats));
+          }catch(e){ /* ignore */ }
+        }
+        // Record a new run; detail: {quizId, score, correct, total, timeMs}
+        function recordRun(detail){
+          if(!detail){ return; }
+          var stats = loadStats();
+          var now = Date.now();
+          var ymd = new Date(now).toISOString().slice(0,10);
+          var run = {
+            ts: now,
+            ymd: ymd,
+            quizId: String(detail.quizId || 'unknown'),
+            score: Number(detail.score || 0),
+            correct: Number(detail.correct || 0),
+            total: Number(detail.total || 0),
+            timeMs: Number(detail.timeMs || 0)
+          };
+          // Append run; cap length to 300
+          stats.runs.push(run);
+          if(stats.runs.length > 300){ stats.runs = stats.runs.slice(stats.runs.length - 300); }
+          // Update aggregate
+          stats.agg.correct += run.correct;
+          stats.agg.total   += run.total;
+          stats.agg.count   += 1;
+          // Update best total (best single run score)
+          if(run.score > (stats.bestTotal || 0)){ stats.bestTotal = run.score; }
+          // Update daily stats
+          stats.daily = stats.daily || {};
+          if(!stats.daily[ymd]){ stats.daily[ymd] = { points: 0, runs: 0 }; }
+          stats.daily[ymd].points += run.score;
+          stats.daily[ymd].runs   += 1;
+          // Save updated
+          saveStats(stats);
+          // Dispatch update event
+          document.dispatchEvent(new CustomEvent('results:stats:updated', { detail: { stats: stats } }));
+        }
+        // Format duration in mm:ss
+        function formatDuration(ms){
+          var sec = Math.floor(ms/1000);
+          var m = Math.floor(sec/60);
+          var s = sec % 60;
+          return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+        }
+        // Render results UI: update KPI and tables
+        function renderResultsUI(){
+          var page = document.getElementById('page-results');
+          if(!page){ return; }
+          // Lazy init of containers
+          ensureContainers();
+          var stats = loadStats();
+          // Compute today
+          var today = new Date();
+          var ymd = today.toISOString().slice(0,10);
+          var todayStats = (stats.daily && stats.daily[ymd]) || { points: 0, runs: 0 };
+          // Update KPIs
+          var bar = document.getElementById('rs-progress-bar');
+          var barTxt = document.getElementById('rs-progress-text');
+          var bestEl = document.getElementById('rs-best-points');
+          var compEl = document.getElementById('rs-completed');
+          var accEl = document.getElementById('rs-accuracy');
+          var todayPoints = todayStats.points || 0;
+          if(bar){ bar.style.width = (todayPoints > 0 ? '100%' : '0%'); }
+          if(barTxt){ barTxt.textContent = todayPoints + ' điểm'; }
+          if(bestEl){ bestEl.textContent = stats.bestTotal || 0; }
+          if(compEl){ compEl.textContent = stats.agg.count || 0; }
+          var accPct = (stats.agg.total > 0) ? Math.round((stats.agg.correct / stats.agg.total) * 100) : 0;
+          if(accEl){ accEl.textContent = accPct + '%'; }
+          // Render history table (max 20 rows)
+          var histBody = document.querySelector('#history-table tbody');
+          if(histBody){
+            histBody.innerHTML = '';
+            var runs = Array.isArray(stats.runs) ? stats.runs.slice() : [];
+            runs.sort(function(a,b){ return b.ts - a.ts; });
+            runs.slice(0,20).forEach(function(r){
+              var tr = document.createElement('tr');
+              var dt = new Date(r.ts);
+              var dateStr = dt.toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric' }) + ' ' + dt.toLocaleTimeString('vi-VN', { hour:'2-digit', minute:'2-digit' });
+              tr.innerHTML = '<td>'+dateStr+'</td>'+
+                             '<td>'+r.quizId+'</td>'+
+                             '<td>'+r.score+'</td>'+
+                             '<td>'+r.correct+' / '+r.total+'</td>'+
+                             '<td>'+formatDuration(r.timeMs)+'</td>';
+              histBody.appendChild(tr);
+            });
+          }
+          // Render per-quiz table
+          var perBody = document.querySelector('#perquiz-table tbody');
+          if(perBody){
+            perBody.innerHTML = '';
+            var per = {};
+            (stats.runs || []).forEach(function(r){
+              var id = r.quizId;
+              if(!per[id]){ per[id] = { best: r.score, runs: 1, latest: r.score }; }
+              else {
+                per[id].runs++;
+                if(r.score > per[id].best){ per[id].best = r.score; }
+                per[id].latest = r.score;
+              }
+            });
+            var rows = Object.keys(per).map(function(k){ return { id: k, best: per[k].best, runs: per[k].runs, latest: per[k].latest }; });
+            rows.sort(function(a,b){ return b.runs - a.runs; });
+            rows.forEach(function(r){
+              var tr = document.createElement('tr');
+              tr.innerHTML = '<td>'+r.id+'</td>'+
+                             '<td>'+r.best+'</td>'+
+                             '<td>'+r.runs+'</td>'+
+                             '<td>'+r.latest+'</td>';
+              perBody.appendChild(tr);
+            });
+          }
+        }
+        // Ensure containers for history and per-quiz tables exist inside page-results
+        function ensureContainers(){
+          var page = document.getElementById('page-results');
+          if(!page){ return; }
+          var container = document.getElementById('user-results-container');
+          if(container){ return; }
+          container = document.createElement('div');
+          container.id = 'user-results-container';
+          // Use responsive layout: two columns on medium screens and one on small
+          container.className = 'grid grid-cols-1 md:grid-cols-2 gap-6';
+          // History section
+          var histDiv = document.createElement('div');
+          histDiv.innerHTML = '<h3 class="text-lg font-bold text-blue-700 mb-2">Lịch sử gần đây</h3>' +
+                              '<div class="overflow-x-auto"><table id="history-table"><thead><tr><th>Thời gian</th><th>Bài</th><th>Điểm</th><th>Đúng/Tổng</th><th>Thời gian</th></tr></thead><tbody></tbody></table></div>';
+          container.appendChild(histDiv);
+          // Per-quiz section
+          var perDiv = document.createElement('div');
+          perDiv.innerHTML = '<h3 class="text-lg font-bold text-blue-700 mb-2">Theo bài</h3>' +
+                             '<div class="overflow-x-auto"><table id="perquiz-table"><thead><tr><th>Bài</th><th>Điểm cao nhất</th><th>Lượt</th><th>Điểm gần nhất</th></tr></thead><tbody></tbody></table></div>';
+          container.appendChild(perDiv);
+          page.appendChild(container);
+        }
+        // Listen for quiz result saved events to record stats
+        document.addEventListener('quiz:result:saved', function(e){
+          try {
+            recordRun(e.detail || {});
+          } catch(_){ /* ignore */ }
+        });
+        // Listen for stats update to re-render UI
+        document.addEventListener('results:stats:updated', function(){ renderResultsUI(); });
+        // Render on DOMContentLoaded when results page is visible
+        if(document.readyState === 'loading'){
+          document.addEventListener('DOMContentLoaded', function(){
+            // override renderResultsPage to use local stats only
+            try {
+              var orig = window.renderResultsPage;
+              window.renderResultsPage = function(){ renderResultsUI(); };
+            }catch(_){}
+            renderResultsUI();
+          });
+        } else {
+          try {
+            var orig = window.renderResultsPage;
+            window.renderResultsPage = function(){ renderResultsUI(); };
+          }catch(_){}
+          renderResultsUI();
+        }
+        // Monkey-patch showLessonSummary to dispatch quiz:result:saved
+        (function(){
+          try {
+            var origFn = window.showLessonSummary;
+            if(typeof origFn === 'function' && !origFn.__patched_for_user_results){
+              var patched = async function(){
+                var res = await origFn.apply(this, arguments);
+                try {
+                  var quizId = (typeof lessonQuizId !== 'undefined') ? lessonQuizId : 'unknown';
+                  var correct = (typeof lessonCorrectAnswers !== 'undefined') ? lessonCorrectAnswers : 0;
+                  var total = (Array.isArray(currentLessonQuestions) ? currentLessonQuestions.length : 0);
+                  var timeMs = 0;
+                  try {
+                    if(typeof lessonStartTime !== 'undefined'){ timeMs = Date.now() - lessonStartTime; }
+                  } catch(_e){}
+                  // Compute score: assume 5 points per correct answer (matching server logic)
+                  var score = correct * 5;
+                  var detail = { quizId: quizId, score: score, correct: correct, total: total, timeMs: timeMs };
+                  document.dispatchEvent(new CustomEvent('quiz:result:saved', { detail: detail }));
+                } catch(_err){}
+                return res;
+              };
+              patched.__patched_for_user_results = true;
+              window.showLessonSummary = patched;
+            }
+          }catch(e){ /* ignore patch errors */ }
+        })();
+      })();
+    </script>
+    <!-- END: user-results -->
 <!-- Removed legacy leaderboard script to prevent duplicate definitions -->
 <script>
 
@@ -4879,6 +5209,18 @@ window.MINIGAME_CFG = {
   }
 
   function startGame(g){
+    // Hijack the legacy startGame: if our smartbear init is available, use it instead of legacy logic
+    if (window && typeof window.hatbotSmartbearInit === 'function') {
+      try {
+        // Hide game list and show play area similar to original startGame
+        const listEl = el('game-list');
+        const playEl = el('game-play');
+        if(listEl) listEl.classList.add('hidden');
+        if(playEl) playEl.classList.remove('hidden');
+      } catch(_){ }
+      window.hatbotSmartbearInit();
+      return;
+    }
     state.current = JSON.parse(JSON.stringify(g));
     state.qIndex = 0; state.score = 0; state.lives = scoring.lives; state.streak = 0;
     state.correctCount = 0; state.totalCount = 0; resetRace(); updateHUD();
@@ -4901,7 +5243,7 @@ window.MINIGAME_CFG = {
 </script>
 <!-- ===== Chatbot toggle & panel (added by ChatGPT) ===== -->
 <button class="kids-font rounded-full shadow-xl p-0 border-0" id="gau-chat-toggle" title="Chat với Gấu Con">
-<img alt="Gấu Chat" src="data/images/logo.jpg" style="width:64px;height:64px;border-radius:50%;border:3px solid white;box-shadow:0 8px 24px rgba(2,6,23,.18)"/>
+<img alt="Gấu Chat" src="data/images/chatbot.png" style="width:64px;height:64px;border-radius:50%;border:3px solid white;box-shadow:0 8px 24px rgba(2,6,23,.18)"/ class="chatbot-attention">
 </button>
 <section class="kids-font" id="gau-chat-panel">
 <div id="gau-chat-header">
@@ -5174,10 +5516,22 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
       const payload = teacher_pass ? {action:"login", teacher_pass} : {action:"login", student_id, pin};
       const data = await postJson(payload);
       if (!data || data.ok!==true) throw new Error(data && data.error ? data.error : "Đăng nhập thất bại");
-      localStorage.setItem("gau_auth", JSON.stringify(data));
-      try{ renderAuthUI(); }catch(e){}
-      showAlert("Đăng nhập thành công! Xin chào " + (data.name || data.student_id), "ok");
+      // Merge server response with any existing auth to preserve local fields (e.g. avatar_custom)
+      const current = (typeof getAuth === 'function' ? (getAuth() || {}) : {});
+      const merged   = Object.assign({}, current, data || {});
+      setAuth(merged);
+      // Use the unified logged-in UI renderer so that avatar, name and meta update correctly
+      if (typeof renderLoggedInUI === 'function') {
+        renderLoggedInUI(merged);
+      }
+      // Still update the auth-only elements for legacy code
+      try { renderAuthUI(); } catch(e){}
+      showAlert("Đăng nhập thành công! Xin chào " + (merged.name || merged.student_id), "ok");
       setTimeout(()=>{ closeModal(); }, 800);
+      // Update any modal header/profile UI if available
+      if (typeof hydrateModalHeader === 'function') {
+        hydrateModalHeader(merged);
+      }
     }catch(err){
       showAlert(err.message||String(err));
     }
@@ -5301,7 +5655,123 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
 </div>
 </div>
 </div>
-<!-- === [AUTH UPGRADE v2.8.0] Account Settings Modal (inserted just before </body>) === -->
+<!-- === [AUTH UPGRADE v2.8.0] Account Settings Modal (inserted just before <script>
+/* ===== Client-side cache for Leaderboard (lb-cache) ===== */
+(function(){
+  const LB_CACHE_NS = 'lb-cache-v1';
+  const TZ = 'Asia/Ho_Chi_Minh';
+
+  function lbScopeToken(scope){
+    const d = new Date();
+    if(scope === 'daily'){
+      const y = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric'}).format(d);
+      const m = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, month: '2-digit'}).format(d);
+      const day = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, day: '2-digit'}).format(d);
+      return `${y}${m}${day}`;
+    }
+    if(scope === 'weekly'){
+      const onejan = new Date(d.getFullYear(),0,1);
+      const week = Math.ceil((((d-onejan)/86400000)+onejan.getDay()+1)/7);
+      return `${d.getFullYear()}w${week}`;
+    }
+    return 'all';
+  }
+  function lbCacheKey(scope){ return `${LB_CACHE_NS}:${scope}:${lbScopeToken(scope)}`; }
+  function readLbCache(scope){
+    try{
+      const raw = localStorage.getItem(lbCacheKey(scope));
+      if(!raw) return null;
+      const obj = JSON.parse(raw);
+      return (obj && Array.isArray(obj.rows)) ? obj : null;
+    }catch(_){ return null; }
+  }
+  function writeLbCache(scope, rows){
+    try{ localStorage.setItem(lbCacheKey(scope), JSON.stringify({ rows, fetchedAt: Date.now() })); }catch(_){}
+  }
+  function cacheIsFresh(scope, maxAgeMs){ 
+    const c = readLbCache(scope); 
+    return !!(c && (Date.now() - (c.fetchedAt||0) < maxAgeMs));
+  }
+
+  // Find tbody/render util (non-destructive: only set innerHTML of rows area)
+  function renderLeaderboardRows(rows){
+    const tbody = document.querySelector('#lb-tbody, .lb-tbody, table#leaderboard tbody');
+    if(!tbody) return;
+    tbody.innerHTML = rows.map((r,i)=>`
+      <tr>
+        <td>${i+1}</td>
+        <td>${r.name || r.username || '—'}</td>
+        <td>${r.class || r.grade || '—'}</td>
+        <td>${r.score ?? r.avg_score ?? 0}</td>
+        <td>${(r.time_ms!=null && r.time_ms!=='' ? r.time_ms : (r.time_taken_ms??'—'))}</td>
+      </tr>
+    `).join('');
+  }
+  function renderSkeleton(count){
+    const tbody = document.querySelector('#lb-tbody, .lb-tbody, table#leaderboard tbody');
+    if(!tbody) return;
+    tbody.innerHTML = Array.from({length:count||8}).map(()=>`
+      <tr class="animate-pulse opacity-60">
+        <td>⋯</td><td>Đang tải…</td><td>⋯</td><td>⋯</td><td>⋯</td>
+      </tr>
+    `).join('');
+  }
+
+  // expose on window so existing code can call
+  window.__LB_CACHE__ = {
+    readLbCache, writeLbCache, cacheIsFresh, renderLeaderboardRows, renderSkeleton
+  };
+
+  // Main show function using existing apiPost if present
+  window.showLeaderboard = async function(scope, limit){
+    scope = scope || 'daily';
+    limit = limit || 50;
+
+    const cached = readLbCache(scope);
+    if(cached){ renderLeaderboardRows(cached.rows); }
+    else { renderSkeleton(8); }
+
+    // Avoid hammering API if a fresh cache exists (<60s)
+    if(cacheIsFresh(scope, 60000)) return;
+
+    try{
+      if (typeof apiPost !== 'function') return; // safety
+      const res = await apiPost('leaderboard', { scope, limit });
+      const rows = (res && (res.rows || res.data || res.items)) || [];
+      if(rows && rows.length){
+        renderLeaderboardRows(rows);
+        writeLbCache(scope, rows);
+      }
+    }catch(e){
+      // keep cached UI silently
+      console && console.debug && console.debug('leaderboard fetch failed, using cache', e);
+    }
+  };
+})();
+
+</script>
+
+<script>
+(function(){
+  function bindTab(selector, scope){
+    var el = document.querySelector(selector);
+    if(!el) return;
+    el.addEventListener('click', function(){ window.showLeaderboard(scope); });
+  }
+  // Common selectors (adjusted to what's likely in your UI)
+  bindTab('#tab-daily', 'daily');
+  bindTab('#tab-weekly', 'weekly');
+  bindTab('#tab-alltime', 'all');
+  // When opening the leaderboard modal/page, attempt default load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){ window.showLeaderboard('daily'); });
+  } else {
+    window.showLeaderboard('daily');
+  }
+})();
+</script>
+
+</body>) === -->
 <div class="fixed inset-0 hidden items-center justify-center z-50" id="account-modal">
 <div class="absolute inset-0 bg-black/40"></div>
 <div class="relative bg-white rounded-3xl shadow-2xl w-[min(92vw,560px)] p-6">
@@ -5346,7 +5816,123 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
 </div>
 </div>
 </div>
-<!-- === [AUTH UPGRADE v2.8.0] Auth wiring appended before </body> (no existing IDs changed) === -->
+<!-- === [AUTH UPGRADE v2.8.0] Auth wiring appended before <script>
+/* ===== Client-side cache for Leaderboard (lb-cache) ===== */
+(function(){
+  const LB_CACHE_NS = 'lb-cache-v1';
+  const TZ = 'Asia/Ho_Chi_Minh';
+
+  function lbScopeToken(scope){
+    const d = new Date();
+    if(scope === 'daily'){
+      const y = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric'}).format(d);
+      const m = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, month: '2-digit'}).format(d);
+      const day = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, day: '2-digit'}).format(d);
+      return `${y}${m}${day}`;
+    }
+    if(scope === 'weekly'){
+      const onejan = new Date(d.getFullYear(),0,1);
+      const week = Math.ceil((((d-onejan)/86400000)+onejan.getDay()+1)/7);
+      return `${d.getFullYear()}w${week}`;
+    }
+    return 'all';
+  }
+  function lbCacheKey(scope){ return `${LB_CACHE_NS}:${scope}:${lbScopeToken(scope)}`; }
+  function readLbCache(scope){
+    try{
+      const raw = localStorage.getItem(lbCacheKey(scope));
+      if(!raw) return null;
+      const obj = JSON.parse(raw);
+      return (obj && Array.isArray(obj.rows)) ? obj : null;
+    }catch(_){ return null; }
+  }
+  function writeLbCache(scope, rows){
+    try{ localStorage.setItem(lbCacheKey(scope), JSON.stringify({ rows, fetchedAt: Date.now() })); }catch(_){}
+  }
+  function cacheIsFresh(scope, maxAgeMs){ 
+    const c = readLbCache(scope); 
+    return !!(c && (Date.now() - (c.fetchedAt||0) < maxAgeMs));
+  }
+
+  // Find tbody/render util (non-destructive: only set innerHTML of rows area)
+  function renderLeaderboardRows(rows){
+    const tbody = document.querySelector('#lb-tbody, .lb-tbody, table#leaderboard tbody');
+    if(!tbody) return;
+    tbody.innerHTML = rows.map((r,i)=>`
+      <tr>
+        <td>${i+1}</td>
+        <td>${r.name || r.username || '—'}</td>
+        <td>${r.class || r.grade || '—'}</td>
+        <td>${r.score ?? r.avg_score ?? 0}</td>
+        <td>${(r.time_ms!=null && r.time_ms!=='' ? r.time_ms : (r.time_taken_ms??'—'))}</td>
+      </tr>
+    `).join('');
+  }
+  function renderSkeleton(count){
+    const tbody = document.querySelector('#lb-tbody, .lb-tbody, table#leaderboard tbody');
+    if(!tbody) return;
+    tbody.innerHTML = Array.from({length:count||8}).map(()=>`
+      <tr class="animate-pulse opacity-60">
+        <td>⋯</td><td>Đang tải…</td><td>⋯</td><td>⋯</td><td>⋯</td>
+      </tr>
+    `).join('');
+  }
+
+  // expose on window so existing code can call
+  window.__LB_CACHE__ = {
+    readLbCache, writeLbCache, cacheIsFresh, renderLeaderboardRows, renderSkeleton
+  };
+
+  // Main show function using existing apiPost if present
+  window.showLeaderboard = async function(scope, limit){
+    scope = scope || 'daily';
+    limit = limit || 50;
+
+    const cached = readLbCache(scope);
+    if(cached){ renderLeaderboardRows(cached.rows); }
+    else { renderSkeleton(8); }
+
+    // Avoid hammering API if a fresh cache exists (<60s)
+    if(cacheIsFresh(scope, 60000)) return;
+
+    try{
+      if (typeof apiPost !== 'function') return; // safety
+      const res = await apiPost('leaderboard', { scope, limit });
+      const rows = (res && (res.rows || res.data || res.items)) || [];
+      if(rows && rows.length){
+        renderLeaderboardRows(rows);
+        writeLbCache(scope, rows);
+      }
+    }catch(e){
+      // keep cached UI silently
+      console && console.debug && console.debug('leaderboard fetch failed, using cache', e);
+    }
+  };
+})();
+
+</script>
+
+<script>
+(function(){
+  function bindTab(selector, scope){
+    var el = document.querySelector(selector);
+    if(!el) return;
+    el.addEventListener('click', function(){ window.showLeaderboard(scope); });
+  }
+  // Common selectors (adjusted to what's likely in your UI)
+  bindTab('#tab-daily', 'daily');
+  bindTab('#tab-weekly', 'weekly');
+  bindTab('#tab-alltime', 'all');
+  // When opening the leaderboard modal/page, attempt default load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){ window.showLeaderboard('daily'); });
+  } else {
+    window.showLeaderboard('daily');
+  }
+})();
+</script>
+
+</body> (no existing IDs changed) === -->
 <!-- Toast message for success notifications -->
 <div class="hidden fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-xl shadow-lg flex items-center gap-2 z-50" id="success-toast">
 <span class="text-xl">✓</span>
@@ -5481,11 +6067,24 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
           // Use the table body with id 'p2-lb-list' (defined in markup)
           const tbody = document.getElementById('p2-lb-list');
           if(!tbody) return;
-          tbody.innerHTML = '<tr><td colspan="5" class="text-center p-3 text-gray-500">Đang tải…</td></tr>';
+          /* cache-first render */
+try{
+  const cached = (window.__LB_CACHE__ && __LB_CACHE__.readLbCache) ? __LB_CACHE__.readLbCache(scope) : null;
+  if(cached && Array.isArray(cached.rows) && cached.rows.length){
+    __LB_CACHE__.renderLeaderboardRows(cached.rows);
+  } else {
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center p-3 text-gray-500">Đang tải…</td></tr>';
+  }
+}catch(_){ tbody.innerHTML = '<tr><td colspan="5" class="text-center p-3 text-gray-500">Đang tải…</td></tr>'; }
+
           const me = await p2Whoami();
           const token = me?.token || null;
           try{
-            const res = await apiPost('leaderboard', { token, scope, limit:50 });
+            // avoid refetch if cache is fresh (<60s)
+if (window.__LB_CACHE__ && __LB_CACHE__.cacheIsFresh && __LB_CACHE__.cacheIsFresh(scope, 60000)) {
+  return; // cache already rendered above
+}
+const res = await apiPost('leaderboard', { token, scope, limit:50 });
             const rows = res.rows || res.data || res.items || [];
             if(!rows.length){
               tbody.innerHTML = '<tr><td colspan="5" class="text-center p-3 text-gray-500">Chưa có dữ liệu</td></tr>';
@@ -5718,7 +6317,7 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6O
 const AUTH_API = 'https://script.google.com/macros/s/AKfycbyWS7vD-md50UZ1XTgIG6OlNmq-Dpv_hHsaYX0qjjTUqlFLYykVZ6gWVDWbJ7-9od0t/exec';  // ← GAS /exec URL
 
 // v2.8.6: new Scoring API for start_run/submit_run/leaderboard calls
-const SCORING_API = 'https://script.google.com/macros/s/AKfycbxfQf59E4GdTbEgUhkKlh7H1ss9wNjBoXO8uAqNgtoxZatLaZw-S7etdIGfk7NUhldO/exec';
+const SCORING_API = 'https://script.google.com/macros/s/AKfycbwcTzG4cT1EiIeJjXd_E98LarABmvE8RRcj3vM5HsHGkcLHGTHb0vF57H456i1hfh8W/exec';
 const AUTH_KEY = "gau_auth";
 
 function getAuth(){ try { return JSON.parse(localStorage.getItem(AUTH_KEY) || "{}"); } catch(e){ return {}; } }
@@ -5828,6 +6427,19 @@ async function bootstrapAuth(){
     if (!me.name && auth.name) merged.name = auth.name;
     if (!me.grade && auth.grade) merged.grade = auth.grade;
     if (!me.class && auth.class) merged.class = auth.class;
+
+    // Restore any previously saved custom avatar from localStorage if the server does not provide one.
+    // This ensures that refreshing the page or reloading the app retains the selected avatar.
+    try {
+      if (merged.student_id && !merged.avatar_custom) {
+        const cached = localStorage.getItem('gau_avatar_custom_' + merged.student_id);
+        if (cached) {
+          merged.avatar_custom = cached;
+        }
+      }
+    } catch (e) {
+      // Swallow any localStorage errors silently
+    }
     setAuth(merged);
     renderLoggedInUI(merged);
   }catch(e){
@@ -5885,9 +6497,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      setAuth(res);
-      renderLoggedInUI(res);
-      hydrateModalHeader(res);
+      // Merge server response with any existing auth so we don't lose local fields like avatar_custom
+      const currentAuth = (typeof getAuth === 'function' ? (getAuth() || {}) : {});
+      const mergedAuth = Object.assign({}, currentAuth, res || {});
+      setAuth(mergedAuth);
+      renderLoggedInUI(mergedAuth);
+      // If the hydrateModalHeader helper exists, pass the merged auth to preserve local fields
+      if (typeof hydrateModalHeader === 'function') {
+        hydrateModalHeader(mergedAuth);
+      }
     });
   }
 
@@ -6306,6 +6924,15 @@ document.addEventListener('DOMContentLoaded', () => {
       delete updatedAuth.avatar_proxy_url_busted;
       delete updatedAuth.avatar_url_busted;
       setAuth(updatedAuth);
+      // Cache the custom avatar per student_id so it persists across reloads and logins
+      try {
+        const a = getAuth() || {};
+        if (a.student_id && a.avatar_custom) {
+          localStorage.setItem('gau_avatar_custom_' + a.student_id, a.avatar_custom);
+        }
+      } catch (e) {
+        // Ignore localStorage errors silently
+      }
       renderLoggedInUI(getAuth());
       hydrateModalHeader(getAuth());
       showSuccessToast('Đã cập nhật avatar!');
@@ -6402,5 +7029,681 @@ document.addEventListener('DOMContentLoaded', () => {
   visibility: visible !important;
 }
 </style>
+    <!-- HATBOT SMARTBEAR START -->
+    <!-- CHANGELOG: 2025-11-04 – Thay module Trò chơi mini cũ bằng cơ chế mới “Hành Trình Gấu Thông Thái”. Thêm HUD, timer, lane mới, nhân vật Gấu chạy/nảy, combo, booster, boss và tính điểm tương thích API v3.0. -->
+    <style id="hatbot-smartbear-style">
+    /* Namespace hatbot-* để tránh xung đột với CSS hiện có */
+    #hatbot-progress-lane{position:relative;height:80px;margin:12px 0;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.06);overflow:hidden;padding:12px}
+    #hatbot-track{position:absolute;left:12px;right:12px;top:34px;height:10px;border-radius:999px;background:linear-gradient(90deg,rgba(0,200,255,.35),rgba(255,255,255,.12))}
+    .hatbot-tick{position:absolute;top:28px;width:2px;height:22px;background:rgba(255,255,255,.15)}
+    .hatbot-chest{position:absolute;top:6px;transform:translateX(-50%);font-size:14px;filter:drop-shadow(0 0 6px rgba(255,200,0,.5))}
+.hatbot-player{position:absolute;left:12px;top:4px;width:60px;height:60px;border-radius:50%;background:none;display:grid;place-items:center;border:2px solid rgba(0,0,0,.2);filter:drop-shadow(0 8px 12px rgba(0,0,0,.35));font-size:40px;line-height:1;color:#71491e}
+    .hatbot-player.glow{filter:drop-shadow(0 0 12px rgba(0,200,255,.95)) drop-shadow(0 8px 12px rgba(0,0,0,.35))}
+    @keyframes hatbot-shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
+    .hatbot-shake{animation:hatbot-shake .4s}
+    .hatbot-float{position:fixed;left:50%;top:24%;transform:translateX(-50%);font-weight:800;opacity:0;transition:opacity .15s ease,transform .5s ease;z-index:10000}
+    .hatbot-float.show{opacity:1;transform:translate(-50%,-16px)}
+    #hatbot-end-modal{position:fixed;inset:0;display:none;place-items:center;z-index:9999;background:rgba(0,0,0,.35)}
+    #hatbot-end-modal.show{display:grid}
+    #hatbot-end-modal .box{width:min(92vw,480px);border-radius:20px;padding:20px;background:#fff;color:#111;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center}
+    #hatbot-end-modal.win .box{animation:hatbot-pop .4s cubic-bezier(.2,1,.2,1)}
+    #hatbot-end-modal.lose .box{animation:hatbot-shake .5s ease-in-out}
+    @keyframes hatbot-pop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+
+    /* Styles for scoreboard pills, answer options and boosters */
+    .hatbot-hud .pill,
+    #hb-opts .pill,
+    #hb-boost .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 9999px;
+      border: 1px solid rgba(0,0,0,0.15);
+      font-size: 0.875rem;
+      line-height: 1.2;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    /* HUD pills (score, hearts, combo, time) */
+    .hatbot-hud .pill {
+      background: rgba(0,0,0,0.05);
+      color: #111;
+      font-weight: 600;
+    }
+    /* Answer option buttons */
+    #hb-opts .pill {
+      width: 100%;
+      background: #ffffff;
+      color: #111;
+      border: 2px solid rgba(0,0,0,0.1);
+    }
+    #hb-opts .pill:hover:not(:disabled) {
+      background: #f3f4f6;
+    }
+    #hb-opts .pill:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    /* Booster buttons */
+    #hb-boost .pill {
+      background: rgba(255,255,255,0.8);
+      color: #111;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+    </style>
+    <script id="hatbot-smartbear-game">
+    (function(){'use strict';
+    if (window.__HATBOT_SMARTBEAR__) return; window.__HATBOT_SMARTBEAR__=true;
+    // ===== Locate game root =====
+    function findGameRoot(){
+      // Prioritize the dedicated game stage container if it exists.  In the original layout
+      // the playable area lives inside #game-play > #game-stage.  Avoid using #race-wrap
+      // since it is hidden by default and is specific to the old flash game.
+      return document.getElementById('game-stage')
+          || document.getElementById('game-area')
+          || document.querySelector('#page-game .card-body')
+          || document.querySelector('#page-game')
+          || document.body;
+    }
+    // ===== Mount new UI =====
+    function mountUI(root){
+      root.innerHTML = `
+        <div class="hatbot-hud" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+          <div class="pill">Điểm: <b id="hb-score">0</b></div>
+          <div class="pill">Tim: <span id="hb-hearts">❤️❤️❤️</span></div>
+          <div class="pill">Combo: <b id="hb-combo">x1</b></div>
+          <div class="pill">Thời gian: <b id="hb-time">90s</b></div>
+        </div>
+        <div id="hatbot-progress-lane">
+          <div id="hatbot-track"></div>
+          <div id="hatbot-player" class="hatbot-player">🐻</div>
+        </div>
+        <div class="timerbar" style="height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:8px">
+          <div id="hb-timebar" style="height:100%;width:100%;background:linear-gradient(90deg,#22c55e,#22d3ee)"></div>
+        </div>
+        <h4 id="hb-q" style="margin:8px 0 6px">Câu hỏi</h4>
+        <div id="hb-opts" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+        <div id="hb-boost" style="display:flex;gap:10px;margin-top:8px"></div>
+        <div id="hatbot-end-modal"><div class="box"><div class="ttl"></div><div class="msg" style="margin:6px 0 10px"></div><button class="btn">Đóng</button></div></div>
+        <div id="hb-float" class="hatbot-float"></div>
+      `;
+    }
+    // ===== Constants =====
+    const START_TIME = 90;
+    const TOTAL_QS   = 10;
+    const MILESTONES = [3,6,9];
+    // ===== State =====
+    const state = { qIndex:0, hearts:3, combo:0, position:0, stepBase:1/TOTAL_QS, score:0, timeLeft:START_TIME, boosters:{fifty:false, freeze:false, x2:false}, boss:false, correctCount:0 };
+    // ===== Helpers =====
+    const $ = (sel,root) => (root||document).querySelector(sel);
+    function renderLane(lane){
+      const w = lane.clientWidth - 24;
+      lane.querySelectorAll('.hatbot-tick,.hatbot-chest').forEach(n=>n.remove());
+      for(let i=1;i<TOTAL_QS;i++){
+        const x = 12 + (i/TOTAL_QS)*w;
+        const t = document.createElement('div'); t.className='hatbot-tick'; t.style.left = x+'px'; lane.appendChild(t);
+      }
+      MILESTONES.forEach(m=>{
+        if(m > TOTAL_QS) return;
+        const x = 12 + (m/TOTAL_QS)*w;
+        const c = document.createElement('div'); c.className='hatbot-chest'; c.style.left = x+'px'; c.textContent='🧰'; lane.appendChild(c);
+      });
+    }
+    function updateHUD(ui){
+      ui.hearts.textContent = '❤️'.repeat(state.hearts);
+      const comboMul = state.combo>=5?1.5: state.combo>=3?1.25:1;
+      ui.combo.textContent = 'x'+comboMul;
+      ui.time.textContent = Math.max(0,Math.ceil(state.timeLeft))+'s';
+      ui.timebar.style.width = Math.max(0,(state.timeLeft/START_TIME)*100)+'%';
+      ui.score.textContent = Math.round(state.score);
+    }
+    function showFloat(text,color='#a7f3d0'){
+      const e = $('#hb-float'); e.textContent = text; e.style.color = color; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'),600);
+    }
+    function animateDash(prevPos, nowPos, lane, player){
+      const w = lane.clientWidth - 24;
+      const fromX = 12 + prevPos * w;
+      const toX   = 12 + nowPos  * w;
+      const midX  = fromX + (toX - fromX)/2;
+      player.classList.add('glow');
+      player.animate([
+        // begin at current horizontal position
+        { transform:`translate(${fromX}px, 0px)` },
+        // lift slightly upwards at the midpoint for a jumping arc
+        { transform:`translate(${midX}px, -24px)` },
+        // land back on the baseline at destination
+        { transform:`translate(${toX}px, 0px)` }
+      ], { duration:650, easing:'ease-out', fill:'forwards' }).onfinish = () => player.classList.remove('glow');
+    }
+    function animateShake(player){ player.classList.add('hatbot-shake'); setTimeout(()=>player.classList.remove('hatbot-shake'),400); }
+    function grantBooster(ui){
+      const order = ['fifty','freeze','x2'];
+      for(const k of order){
+        if(!state.boosters[k]){
+          state.boosters[k] = true;
+          const btn = document.createElement('button'); btn.className='pill'; btn.textContent = k==='fifty' ? '🎲 50/50' : k==='freeze' ? '❄️ +10s' : '✨ x2 điểm';
+          btn.onclick = () => {
+            if(k==='fifty'){
+              const opts = [...ui.opts.children];
+              const wrong = opts.filter(el=>el.dataset.correct!=='1').sort(()=>Math.random()-.5).slice(0, Math.max(0, opts.length-2));
+              wrong.forEach(el=> el.disabled = true);
+            }
+            if(k==='freeze') state.timeLeft += 10;
+            if(k==='x2'){ state.boosters.x2 = true; setTimeout(()=>{ state.boosters.x2 = false; }, 10000); }
+            btn.disabled = true;
+            showFloat(btn.textContent,'#fde68a'); updateHUD(ui);
+          };
+          ui.boost.appendChild(btn);
+          break;
+        }
+      }
+    }
+    function buildBoss(){ return { q:'Chọn mô tả ĐÚNG NHẤT về JSON:', opts:['Ngôn ngữ lập trình','Định dạng dữ liệu dạng văn bản','Kiểu ảnh nén','Thiết bị vào/ra'], a:1, diff:1.5 }; }
+    const QUESTION_BANK = [
+      { q:'Đâu là thiết bị nhập dữ liệu?', opts:['Chuột','Màn hình','Máy in','Loa'], a:0, diff:1 },
+      { q:'CPU là viết tắt của cụm từ nào?', opts:['Central Processing Unit','Computer Personal Unit','Central Print Unit','Control Program Unit'], a:0, diff:1.3 },
+      { q:'Thiết bị nào dùng để lưu trữ dữ liệu lâu dài?', opts:['RAM','Ổ cứng','Cache','Màn hình'], a:1, diff:1.1 },
+      { q:'Bit là gì trong tin học?', opts:['Đơn vị nhỏ nhất của dữ liệu','Phần mềm','Thiết bị','Ngôn ngữ lập trình'], a:0, diff:1 },
+      { q:'Hệ điều hành phổ biến trên máy tính cá nhân?', opts:['Windows','Photoshop','Chrome','PowerPoint'], a:0, diff:1 },
+      { q:'Thiết bị nào dùng để kết nối Internet?', opts:['Modem','Máy in','Scanner','Webcam'], a:0, diff:1 },
+      { q:'Tổ hợp phím Ctrl + C thường dùng để làm gì?', opts:['Sao chép','Lưu','Dán','Cắt'], a:0, diff:1 },
+      { q:'Phần mềm soạn thảo văn bản phổ biến là?', opts:['Microsoft Word','Excel','PowerPoint','Chrome'], a:0, diff:1 },
+      { q:'HTML được dùng để?', opts:['Tạo trang web','Viết chương trình','Thiết kế slide','Tính toán'], a:0, diff:1.2 },
+      { q:'Máy tính xử lý thông tin bằng gì?', opts:['Câu lệnh','Bàn phím','Chuột','Màn hình'], a:0, diff:1 }
+    ];
+    function renderQuestion(ui,lane,player){
+      const isBoss = state.boss;
+      let item = isBoss ? buildBoss() : QUESTION_BANK[state.qIndex % QUESTION_BANK.length];
+      const prefix = isBoss ? '🛡️ BOSS: ' : 'Câu '+(state.qIndex+1)+'/'+TOTAL_QS+': ';
+      ui.q.textContent = prefix + item.q;
+      ui.opts.innerHTML = '';
+      item.opts.forEach((t,i) => {
+        const b = document.createElement('button'); b.className='pill'; b.style.textAlign='left'; b.textContent=t; b.dataset.correct = (i===item.a ? '1' : '0'); b.onclick = () => onAnswer({ correct: i===item.a, diffMul: item.diff || 1 }, ui, lane, player); ui.opts.appendChild(b);
+      });
+    }
+    function onAnswer(result, ui, lane, player){
+      [...ui.opts.children].forEach(b=> b.disabled = true);
+      const prevPos = state.position;
+      if(result.correct){
+        state.combo++;
+        const comboMul = state.combo>=5?1.5: state.combo>=3?1.25:1;
+        let step = state.stepBase * comboMul;
+        if(state.boss) step *= 1.2;
+        state.position = Math.min(1, state.position + step);
+        const pts = 10 * (result.diffMul||1) * comboMul * (state.boosters.x2 ? 2 : 1);
+        state.score += pts;
+        state.correctCount++;
+        animateDash(prevPos, state.position, lane, player);
+        showFloat('+'+Math.round(pts),'#86efac');
+      } else {
+        state.combo = 0; state.hearts--; animateShake(player); showFloat('−1 ❤️','#fecaca'); if(state.hearts <=0){ updateHUD(ui); return endGame('out_of_hearts', ui); }
+      }
+      const passedIdx = Math.floor(state.position * TOTAL_QS);
+      if(!state.boss && MILESTONES.includes(passedIdx)) grantBooster(ui);
+      updateHUD(ui);
+      if(state.position >=1 && !state.boss){ state.qIndex = TOTAL_QS-1; state.boss=true; renderQuestion(ui,lane,player); return; }
+      state.qIndex++;
+      if(state.boss){ if(result.correct && state.position >=1){ return endGame('finish',ui); } renderQuestion(ui,lane,player); return; }
+      if(state.qIndex >= TOTAL_QS){ state.boss=true; renderQuestion(ui,lane,player); return; }
+      renderQuestion(ui,lane,player);
+    }
+    function calcStars(){ const total = TOTAL_QS + 1; const acc = state.correctCount / total; const timePct = state.timeLeft/START_TIME; if(acc>=0.9 && timePct>=0.3) return 3; if(acc>=0.7) return 2; return state.position>=1 ? 1 : 0; }
+    async function endGame(reason, ui){ clearInterval(window.__hatbot_timer__); [...ui.opts.children].forEach(b=> b.disabled=true); const bonus = Math.ceil(state.timeLeft/5); const finalScore = Math.round(state.score + bonus); const stars = calcStars(); try{ if(typeof window.saveResultV3 === 'function'){ await window.saveResultV3({ mode:'GauThongThai', score:finalScore, stars, correct:state.correctCount, total:TOTAL_QS+1, timeLeft:Math.max(0,Math.ceil(state.timeLeft)), reason }); } else if(window.GAS_ENDPOINT){ await fetch(window.GAS_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'save_result', payload:{ mode:'GauThongThai', score:finalScore, stars, correct:state.correctCount, total:TOTAL_QS+1, timeLeft:Math.max(0,Math.ceil(state.timeLeft)), reason }}) }); } }catch(_){}
+      const m = document.getElementById('hatbot-end-modal'); m.className = reason==='finish'? 'show win':'show lose'; m.querySelector('.ttl').textContent = reason==='finish' ? 'Hoàn thành 🎉' : 'Thử lại nhé 😿'; m.querySelector('.msg').textContent = `Điểm ${finalScore} • ⭐ ${'★'.repeat(stars)}${'☆'.repeat(3-stars)}`; m.querySelector('.btn').onclick = () => { m.className=''; location.reload(); };
+    }
+    function startTimer(ui){ clearInterval(window.__hatbot_timer__); let last = performance.now(); window.__hatbot_timer__ = setInterval(()=>{ const now = performance.now(); const dt = (now - last)/1000; last = now; state.timeLeft -= dt; if(state.timeLeft <=0){ state.timeLeft = 0; updateHUD(ui); endGame('timeout', ui); } else { updateHUD(ui); } },200);
+    }
+    function init(){
+      const root = findGameRoot();
+      if(!root) return;
+      // Mount our UI into the game stage
+      mountUI(root);
+      const ui = {
+        lane: document.getElementById('hatbot-progress-lane'),
+        player: document.getElementById('hatbot-player'),
+        q: document.getElementById('hb-q'),
+        opts: document.getElementById('hb-opts'),
+        boost: document.getElementById('hb-boost'),
+        hearts: document.getElementById('hb-hearts'),
+        combo: document.getElementById('hb-combo'),
+        time: document.getElementById('hb-time'),
+        timebar: document.getElementById('hb-timebar'),
+        score: document.getElementById('hb-score')
+      };
+      // Reset game state variables
+      state.qIndex = 0;
+      state.hearts = 3;
+      state.combo  = 0;
+      state.position = 0;
+      state.score = 0;
+      state.timeLeft = START_TIME;
+      state.boosters = {fifty:false, freeze:false, x2:false};
+      state.boss = false;
+      state.correctCount = 0;
+      // Render lane and HUD, start timer and first question
+      renderLane(ui.lane);
+      updateHUD(ui);
+      startTimer(ui);
+      renderQuestion(ui, ui.lane, ui.player);
+      window.addEventListener('resize', () => renderLane(ui.lane));
+      // Hide old UI elements that belong to the legacy mini‑game so they don't overlap
+      const hideIds = ['game-question-text','game-feedback','game-next','race-wrap'];
+      hideIds.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.style.display = 'none';
+      });
+    }
+
+    // Expose init globally so legacy code can invoke it instead of its own startGame logic
+    try{
+      window.hatbotSmartbearInit = init;
+    }catch(_){ }
+    // Monkey patch existing functions
+    // Override resetGame (if defined) to start our new game instead of old one.
+    if(typeof window.resetGame === 'function'){
+      window.resetGame = function(){ init(); };
+    }
+    // Override generic startMiniGame if present to call our init
+    if(typeof window.startMiniGame === 'function'){
+      window.startMiniGame = function(){ init(); };
+    }
+    // Override startGame (used by mini games list) to hide old UI and launch our game
+    if(typeof window.startGame === 'function'){
+      window.startGame = function(g){
+        try{
+          // hide the list and show play area similar to original startGame
+          const listEl = document.getElementById('game-list');
+          const playEl = document.getElementById('game-play');
+          if(listEl) listEl.classList.add('hidden');
+          if(playEl) playEl.classList.remove('hidden');
+          // hide legacy score/lives/time display if present
+          const e1=document.getElementById('game-score');
+          const e2=document.getElementById('game-lives');
+          const e3=document.getElementById('game-timer');
+          if(e1) e1.parentElement.style.display='none';
+          if(e2) e2.parentElement.style.display='none';
+          if(e3) e3.parentElement.style.display='none';
+        }catch(_){}
+        init();
+      };
+    }
+    // Intercept showPage to start our game automatically when navigating to game page
+    if(typeof window.showPage === 'function'){
+      const origShow = window.showPage;
+      window.showPage = function(page){
+        const res = origShow.apply(this, arguments);
+        if(page === 'page-game'){
+          // hide legacy scoreboard elements
+          const e1=document.getElementById('game-score');
+          const e2=document.getElementById('game-lives');
+          const e3=document.getElementById('game-timer');
+          if(e1) e1.parentElement.style.display='none';
+          if(e2) e2.parentElement.style.display='none';
+          if(e3) e3.parentElement.style.display='none';
+          init();
+        }
+        return res;
+      };
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const currentPage = document.querySelector('#page-game');
+      if (currentPage && currentPage.style.display !== 'none'){
+        init();
+      }
+      // Additionally, monitor interactions on the page to automatically load our game when the game root appears.
+      function autoStart(){
+        const root = findGameRoot();
+        // If a root exists and our progress lane hasn't been mounted yet
+        if(root && !document.getElementById('hatbot-progress-lane')){
+          // Hide the list and show the play area (if defined in original layout)
+          const listEl = document.getElementById('game-list');
+          const playEl = document.getElementById('game-play');
+          if(listEl) listEl.classList.add('hidden');
+          if(playEl) playEl.classList.remove('hidden');
+          // Hide legacy scoreboard elements
+          const s1=document.getElementById('game-score');
+          const s2=document.getElementById('game-lives');
+          const s3=document.getElementById('game-timer');
+          if(s1) s1.parentElement.style.display='none';
+          if(s2) s2.parentElement.style.display='none';
+          if(s3) s3.parentElement.style.display='none';
+          init();
+        }
+      }
+      // Run once immediately
+      setTimeout(autoStart, 100);
+      // Also run after any click (user selecting a mini game)
+      document.body.addEventListener('click', () => setTimeout(autoStart, 50), true);
+
+      // Intercept clicks on the mini game list so that old handlers don't start the legacy games.
+      const gameList = document.getElementById('game-list');
+      if(gameList){
+        gameList.addEventListener('click', function(ev){
+          const btn = ev.target.closest('button');
+          if(!btn) return;
+          // Prevent the legacy click handler for this card from firing.  Using stopImmediatePropagation
+          // ensures no other listener on this element will run.
+          ev.stopImmediatePropagation();
+          ev.preventDefault();
+          // Hide the list and show game-play area
+          const listEl = document.getElementById('game-list');
+          const playEl = document.getElementById('game-play');
+          if(listEl) listEl.classList.add('hidden');
+          if(playEl) playEl.classList.remove('hidden');
+          // Hide legacy score/lives/time boxes
+          const s1=document.getElementById('game-score');
+          const s2=document.getElementById('game-lives');
+          const s3=document.getElementById('game-timer');
+          if(s1) s1.parentElement.style.display='none';
+          if(s2) s2.parentElement.style.display='none';
+          if(s3) s3.parentElement.style.display='none';
+          // Start our game
+          init();
+        }, true);
+      }
+    });
+    })();
+    </script>
+    <!-- HATBOT SMARTBEAR END -->
+
+    <!-- quizFix START -->
+    <script>
+    (function(){
+      'use strict';
+      // Define safe utilities for splitting strings and ensuring arrays
+      const quizFix = {
+        split: function(val, sep){
+          return (val ?? '').toString().split(sep).map(function(s){ return s.trim(); }).filter(Boolean);
+        },
+        arr: function(val){ return Array.isArray(val) ? val : []; }
+      };
+      // expose globally
+      window.quizFix = quizFix;
+
+      // Helper to find the quiz answer area. Fallback to empty object when missing.
+      function getAnswerArea(){
+        return document.getElementById('quiz-answer-area') || { innerHTML:'' };
+      }
+
+      // ===== Monkey patches for Phiếu bài tập – Khối 3 =====
+      // Guard renderTrueFalse
+      if(typeof window.renderTrueFalse === 'function'){
+        const __origTrueFalse = window.renderTrueFalse;
+        window.renderTrueFalse = function(q){
+          try{
+            // Ensure statements array exists with at least one item
+            if(!Array.isArray(q.statements) || q.statements.length===0){
+              const placeholder = (q && q.question) ? q.question : 'Đúng hay Sai?';
+              q.statements = [{ text: placeholder, correct: true }];
+            }
+          }catch(_e){}
+          return __origTrueFalse.call(this, q);
+        };
+      }
+
+      // Guard renderMultipleChoice
+      if(typeof window.renderMultipleChoice === 'function'){
+        const __origMultiple = window.renderMultipleChoice;
+        window.renderMultipleChoice = function(q){
+          try{
+            // If options missing, try to derive from q.choices and mark correct ones using q.answer
+            if(!Array.isArray(q.options) || q.options.length===0){
+              const opts = quizFix.split(q.choices, '|');
+              if(opts.length){
+                const expected = quizFix.split(q.answer, '|');
+                q.options = opts.map(function(text){ return { text: text, correct: expected.includes(text) }; });
+              }
+            }
+            // When still no options, show friendly message and skip original renderer
+            if(!Array.isArray(q.options) || q.options.length===0){
+              const area = getAnswerArea();
+              area.innerHTML = '<div class="text-gray-600 italic">Chưa có dữ liệu lựa chọn cho câu hỏi này</div>';
+              return;
+            }
+          }catch(_e){}
+          return __origMultiple.call(this, q);
+        };
+      }
+
+      // Guard renderFillInBlank
+      if(typeof window.renderFillInBlank === 'function'){
+        const __origFill = window.renderFillInBlank;
+        window.renderFillInBlank = function(q){
+          try{
+            if(!q || !q.sentence || typeof q.sentence !== 'string'){ q = Object.assign({}, q, { sentence: '' }); }
+          }catch(_e){}
+          return __origFill.call(this, q);
+        };
+      }
+      // Guard renderFillInBlankChoice
+      if(typeof window.renderFillInBlankChoice === 'function'){
+        const __origFillChoice = window.renderFillInBlankChoice;
+        window.renderFillInBlankChoice = function(q){
+          try{
+            if(!q || !q.sentence || typeof q.sentence !== 'string'){ q = Object.assign({}, q, { sentence: '' }); }
+            if(!Array.isArray(q.options) || q.options.length===0){
+              const opts = quizFix.split(q.choices, '|');
+              if(opts.length) q.options = opts;
+            }
+          }catch(_e){}
+          return __origFillChoice.call(this, q);
+        };
+      }
+
+      // Guard renderMatching (and variants)
+      if(typeof window.renderMatching === 'function'){
+        const __origMatching = window.renderMatching;
+        window.renderMatching = function(q){
+          try{
+            // Build column arrays from various possible property names
+            let colA = quizFix.arr(q.columnA || q.left || q.pairsA);
+            let colB = quizFix.arr(q.columnB || q.right || q.pairsB);
+            // If empty and pairsText provided, parse pairsText with lines separated by newline and ~ delimiter
+            if((!colA.length || !colB.length) && q && q.pairsText){
+              const lines = quizFix.split(q.pairsText, '\n');
+              lines.forEach(function(line){
+                const parts = quizFix.split(line, '~');
+                if(parts.length >= 2){
+                  colA.push(parts[0]);
+                  colB.push(parts[1]);
+                }
+              });
+            }
+            // Assign back to q
+            q.columnA = colA;
+            q.columnB = colB;
+            // When still missing items, show friendly note and skip original renderer
+            if(!colA.length || !colB.length){
+              const area = getAnswerArea();
+              area.innerHTML = '<div class="text-gray-600 italic">Chưa có dữ liệu item cho bài này</div>';
+              return;
+            }
+          }catch(_e){}
+          return __origMatching.call(this, q);
+        };
+      }
+
+      // Provide isCorrect helper for unified answer checking
+      if(typeof window.isCorrect !== 'function'){
+        window.isCorrect = function(q, user){
+          const ansStr = (q.answer ?? '').toString();
+          if(q.type === 'matching'){ // expected user and ans as "A1-B2;A2-B1"
+            const expected = quizFix.split(ansStr, ';');
+            const got = quizFix.split(user ?? '', ';');
+            return JSON.stringify([...got].sort()) === JSON.stringify([...expected].sort());
+          }
+          if(q.type === 'true_false'){
+            return (user ?? '') === ansStr;
+          }
+          // Multiple choice supports multiple answers separated by |
+          const expected = quizFix.split(ansStr, '|');
+          const got = quizFix.split(user ?? '', '|');
+          return expected.length ? expected.every(function(x){ return got.includes(x); }) && got.every(function(x){ return expected.includes(x); }) : false;
+        };
+      }
+    })();
+    </script>
+    <!-- quizFix END -->
+    <!-- About Modal START -->
+    <div id="about-modal" class="about-modal fixed inset-0 z-50 items-center justify-center bg-black/50">
+      <div class="modal-content">
+        <button class="modal-close" data-close-about>&times;</button>
+        <h2 class="text-2xl font-bold mb-4">Giới thiệu phần mềm</h2>
+        <!-- hiển thị phiên bản rõ ràng cho người dùng -->
+        <p class="text-sm text-gray-500 mb-2">Phiên bản: <b>v3.5.2</b></p>
+        <p class="mb-4">Gấu Con Học Tin là trợ lý học tập cho học sinh tiểu học với các module: Video học để xem bài giảng, Phiếu bài tập để luyện tập, Mini game ôn luyện kiến thức, Bảng xếp hạng để so tài, và Kết quả học tập chi tiết. Phần mềm hỗ trợ các khối 1–2–3 (phiên bản v3.5.2).</p>
+        <p class="mb-4">
+          <strong>Tác giả:</strong> Nguyễn Thị Bình<br/>
+          <strong>Email:</strong> nguyenthibinh222430@gmail.com<br/>
+          <strong>Điện thoại:</strong> 0912633111<br/>
+          <strong>Đơn vị:</strong> Trường Tiểu học Võng La<br/>
+          <strong>Đồng tác giả:</strong> Cao Thị Nguyệt; Nguyễn Thị Minh Hiển
+        </p>
+      </div>
+    </div>
+    <!-- About Modal END -->
+    <!-- MODULES SCRIPT START -->
+    <script>
+    // JS to open and close the About modal
+    document.addEventListener('DOMContentLoaded', function() {
+      var aboutBtn = document.querySelector('[data-open-about]');
+      var aboutModal = document.getElementById('about-modal');
+      var closeBtn = aboutModal ? aboutModal.querySelector('[data-close-about]') : null;
+      if (aboutBtn && aboutModal) {
+        aboutBtn.addEventListener('click', function () {
+          aboutModal.classList.add('show');
+        });
+      }
+      if (closeBtn) {
+        closeBtn.addEventListener('click', function () {
+          aboutModal.classList.remove('show');
+        });
+      }
+      // click outside to close
+      if (aboutModal) {
+        aboutModal.addEventListener('click', function(e) {
+          if (e.target === aboutModal) {
+            aboutModal.classList.remove('show');
+          }
+        });
+      }
+    });
+    </script>
+    <!-- MODULES SCRIPT END -->
+<script>
+/* ===== Client-side cache for Leaderboard (lb-cache) ===== */
+(function(){
+  const LB_CACHE_NS = 'lb-cache-v1';
+  const TZ = 'Asia/Ho_Chi_Minh';
+
+  function lbScopeToken(scope){
+    const d = new Date();
+    if(scope === 'daily'){
+      const y = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric'}).format(d);
+      const m = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, month: '2-digit'}).format(d);
+      const day = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, day: '2-digit'}).format(d);
+      return `${y}${m}${day}`;
+    }
+    if(scope === 'weekly'){
+      const onejan = new Date(d.getFullYear(),0,1);
+      const week = Math.ceil((((d-onejan)/86400000)+onejan.getDay()+1)/7);
+      return `${d.getFullYear()}w${week}`;
+    }
+    return 'all';
+  }
+  function lbCacheKey(scope){ return `${LB_CACHE_NS}:${scope}:${lbScopeToken(scope)}`; }
+  function readLbCache(scope){
+    try{
+      const raw = localStorage.getItem(lbCacheKey(scope));
+      if(!raw) return null;
+      const obj = JSON.parse(raw);
+      return (obj && Array.isArray(obj.rows)) ? obj : null;
+    }catch(_){ return null; }
+  }
+  function writeLbCache(scope, rows){
+    try{ localStorage.setItem(lbCacheKey(scope), JSON.stringify({ rows, fetchedAt: Date.now() })); }catch(_){}
+  }
+  function cacheIsFresh(scope, maxAgeMs){ 
+    const c = readLbCache(scope); 
+    return !!(c && (Date.now() - (c.fetchedAt||0) < maxAgeMs));
+  }
+
+  // Find tbody/render util (non-destructive: only set innerHTML of rows area)
+  function renderLeaderboardRows(rows){
+    const tbody = document.querySelector('#lb-tbody, .lb-tbody, table#leaderboard tbody');
+    if(!tbody) return;
+    tbody.innerHTML = rows.map((r,i)=>`
+      <tr>
+        <td>${i+1}</td>
+        <td>${r.name || r.username || '—'}</td>
+        <td>${r.class || r.grade || '—'}</td>
+        <td>${r.score ?? r.avg_score ?? 0}</td>
+        <td>${(r.time_ms!=null && r.time_ms!=='' ? r.time_ms : (r.time_taken_ms??'—'))}</td>
+      </tr>
+    `).join('');
+  }
+  function renderSkeleton(count){
+    const tbody = document.querySelector('#lb-tbody, .lb-tbody, table#leaderboard tbody');
+    if(!tbody) return;
+    tbody.innerHTML = Array.from({length:count||8}).map(()=>`
+      <tr class="animate-pulse opacity-60">
+        <td>⋯</td><td>Đang tải…</td><td>⋯</td><td>⋯</td><td>⋯</td>
+      </tr>
+    `).join('');
+  }
+
+  // expose on window so existing code can call
+  window.__LB_CACHE__ = {
+    readLbCache, writeLbCache, cacheIsFresh, renderLeaderboardRows, renderSkeleton
+  };
+
+  // Main show function using existing apiPost if present
+  window.showLeaderboard = async function(scope, limit){
+    scope = scope || 'daily';
+    limit = limit || 50;
+
+    const cached = readLbCache(scope);
+    if(cached){ renderLeaderboardRows(cached.rows); }
+    else { renderSkeleton(8); }
+
+    // Avoid hammering API if a fresh cache exists (<60s)
+    if(cacheIsFresh(scope, 60000)) return;
+
+    try{
+      if (typeof apiPost !== 'function') return; // safety
+      const res = await apiPost('leaderboard', { scope, limit });
+      const rows = (res && (res.rows || res.data || res.items)) || [];
+      if(rows && rows.length){
+        renderLeaderboardRows(rows);
+        writeLbCache(scope, rows);
+      }
+    }catch(e){
+      // keep cached UI silently
+      console && console.debug && console.debug('leaderboard fetch failed, using cache', e);
+    }
+  };
+})();
+
+</script>
+
+<script>
+(function(){
+  function bindTab(selector, scope){
+    var el = document.querySelector(selector);
+    if(!el) return;
+    el.addEventListener('click', function(){ window.showLeaderboard(scope); });
+  }
+  // Common selectors (adjusted to what's likely in your UI)
+  bindTab('#tab-daily', 'daily');
+  bindTab('#tab-weekly', 'weekly');
+  bindTab('#tab-alltime', 'all');
+  // When opening the leaderboard modal/page, attempt default load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){ window.showLeaderboard('daily'); });
+  } else {
+    window.showLeaderboard('daily');
+  }
+})();
+</script>
+
 </body>
 </html>
