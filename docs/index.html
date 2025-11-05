@@ -4085,7 +4085,7 @@ try{
     <script>
     // BXH mini game - fetch leaderboard & report score
     (function(){
-      const MINI_API = 'https://script.google.com/macros/s/AKfycbzYZb5RbMEFSoEiOW1W90nP605kzraxmD3Ut1_tO_IKVBgD5TdMNHdh0EwAUHRJLI1pXQ/exec';
+      const MINI_API = 'https://script.google.com/macros/s/AKfycbzd7m_7PksgjcP-FrBFbnbV7S_2sUt74Qj9-4YHOW_SLuaCdtSL4qysjdD839MhX6wcgQ/exec';
       function getAuthToken(){
         return localStorage.getItem('token') || localStorage.getItem('auth_token') || localStorage.getItem('gcht_token') || '';
       }
@@ -4108,7 +4108,11 @@ try{
           errEl.classList.add('hidden');
           errEl.textContent = '';
         }
-        const token = getAuthToken() || '';
+        const token = getAuthToken();
+        if(!token){
+          if(errEl){ errEl.classList.remove('hidden'); errEl.textContent = 'Chưa đăng nhập.'; }
+          return;
+        }
         try {
           const payload = { action: 'leaderboard', scope: 'daily', limit: 50 };
           if (token) payload.token = token;
@@ -4151,28 +4155,29 @@ try{
         }
       }
       async function miniStartRun(gameId){
-        const token = getAuthToken();
-        if(!token) return null;
+        const token = getAuthToken() || '';
         try {
+          const payload = { action: 'start_run', game_id: gameId, ua: 'web' };
+          if (token) payload.token = token;
           const res = await fetch(MINI_API, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'start_run', token: token, game_id: gameId })
+            headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+            body: JSON.stringify(payload)
           });
           const data = await res.json();
           return (data && data.ok) ? data.run_id : null;
         } catch(ex){ return null; }
       }
       async function miniSubmitScore(runId, gameId, rawPoints){
-        const token = getAuthToken();
-        if(!token) return;
+        const token = getAuthToken() || '';
         try {
+          const payload = { action: 'submit_score', run_id: runId, game_id: gameId, raw_points: rawPoints };
+          if (token) payload.token = token;
           await fetch(MINI_API, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'submit_score', token: token, run_id: runId, game_id: gameId, raw_points: rawPoints })
+            headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+            body: JSON.stringify(payload)
           });
-          // Refresh BXH soon after submit
           if(window.fetchMiniBXH) setTimeout(window.fetchMiniBXH, 800);
         } catch(ex){}
       }
@@ -5875,7 +5880,7 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyBZC7beL0eb386iH7oXdL
         <td>${i+1}</td>
         <td>${r.name || r.username || '—'}</td>
         <td>${r.class || r.grade || '—'}</td>
-        <td>${r.score ?? r.avg_score ?? 0}</td>
+        <td>${r.points ?? r.score ?? r.avg_score ?? 0}</td>
         <td>${(r.time_ms!=null && r.time_ms!=='' ? r.time_ms : (r.time_taken_ms??'—'))}</td>
       </tr>
     `).join('');
@@ -5908,9 +5913,13 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyBZC7beL0eb386iH7oXdL
     if(cacheIsFresh(scope, 60000)) return;
 
     try{
-      if (typeof apiPost !== 'function') return; // safety
-      const res = await apiPost('leaderboard', { scope, limit });
-      const rows = (res && (res.rows || res.data || res.items)) || [];
+      const res = await fetch("https://script.google.com/macros/s/AKfycbwLkpDWtz5mYu-msNEIFT1AGpTXX3dIyniIzUCx4VKPJo0sfttV3cg7mGmcXOtXr7tJzg/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "leaderboard", scope, limit })
+      });
+      const json = await res.json();
+      const rows = (json && (json.rows || json.data || json.items)) || [];
       if(rows && rows.length){
         renderLeaderboardRows(rows);
         writeLbCache(scope, rows);
@@ -6132,7 +6141,7 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyBZC7beL0eb386iH7oXdL
         <td>${i+1}</td>
         <td>${r.name || r.username || '—'}</td>
         <td>${r.class || r.grade || '—'}</td>
-        <td>${r.score ?? r.avg_score ?? 0}</td>
+        <td>${r.points ?? r.score ?? r.avg_score ?? 0}</td>
         <td>${(r.time_ms!=null && r.time_ms!=='' ? r.time_ms : (r.time_taken_ms??'—'))}</td>
       </tr>
     `).join('');
@@ -6165,9 +6174,13 @@ const AUTH_API = "https://script.google.com/macros/s/AKfycbyBZC7beL0eb386iH7oXdL
     if(cacheIsFresh(scope, 60000)) return;
 
     try{
-      if (typeof apiPost !== 'function') return; // safety
-      const res = await apiPost('leaderboard', { scope, limit });
-      const rows = (res && (res.rows || res.data || res.items)) || [];
+      const res = await fetch("https://script.google.com/macros/s/AKfycbwLkpDWtz5mYu-msNEIFT1AGpTXX3dIyniIzUCx4VKPJo0sfttV3cg7mGmcXOtXr7tJzg/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "leaderboard", scope, limit })
+      });
+      const json = await res.json();
+      const rows = (json && (json.rows || json.data || json.items)) || [];
       if(rows && rows.length){
         renderLeaderboardRows(rows);
         writeLbCache(scope, rows);
@@ -7905,7 +7918,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>${i+1}</td>
         <td>${r.name || r.username || '—'}</td>
         <td>${r.class || r.grade || '—'}</td>
-        <td>${r.score ?? r.avg_score ?? 0}</td>
+        <td>${r.points ?? r.score ?? r.avg_score ?? 0}</td>
         <td>${(r.time_ms!=null && r.time_ms!=='' ? r.time_ms : (r.time_taken_ms??'—'))}</td>
       </tr>
     `).join('');
@@ -7938,9 +7951,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if(cacheIsFresh(scope, 60000)) return;
 
     try{
-      if (typeof apiPost !== 'function') return; // safety
-      const res = await apiPost('leaderboard', { scope, limit });
-      const rows = (res && (res.rows || res.data || res.items)) || [];
+      const res = await fetch("https://script.google.com/macros/s/AKfycbwLkpDWtz5mYu-msNEIFT1AGpTXX3dIyniIzUCx4VKPJo0sfttV3cg7mGmcXOtXr7tJzg/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "leaderboard", scope, limit })
+      });
+      const json = await res.json();
+      const rows = (json && (json.rows || json.data || json.items)) || [];
       if(rows && rows.length){
         renderLeaderboardRows(rows);
         writeLbCache(scope, rows);
